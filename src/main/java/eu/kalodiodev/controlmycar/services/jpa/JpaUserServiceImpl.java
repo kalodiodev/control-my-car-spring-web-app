@@ -1,4 +1,4 @@
-package eu.kalodiodev.controlmycar.repositories.jpa;
+package eu.kalodiodev.controlmycar.services.jpa;
 
 import eu.kalodiodev.controlmycar.repositories.UserRepository;
 import eu.kalodiodev.controlmycar.services.UserService;
