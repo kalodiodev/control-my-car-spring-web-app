@@ -3,10 +3,7 @@ package eu.kalodiodev.controlmycar.domains;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -34,5 +31,9 @@ public class Car {
 
     @Column(nullable = false)
     private Double initialOdometer;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }
