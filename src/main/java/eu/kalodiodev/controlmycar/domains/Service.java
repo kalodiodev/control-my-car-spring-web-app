@@ -7,32 +7,29 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.time.LocalDate;
 
 @Entity
 @Getter
 @Setter
-public class Car {
+public class Service {
 
     @Id
     @GeneratedValue
     private Long id;
 
     @Column(nullable = false)
-    private String manufacturer;
+    private LocalDate date;
 
     @Column(nullable = false)
-    private String model;
-
-    @Column(nullable = true)
-    private Integer manufacturedYear;
-
-    @Column(nullable = true)
-    private Integer ownedYear;
+    private String title;
 
     @Column
-    private Double boughtPrice;
+    private String description;
 
     @Column(nullable = false)
-    private Double initialOdometer;
+    private Double odometer;
 
+    @Column(nullable = false)
+    private Double cost;
 }

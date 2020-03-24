@@ -1,12 +1,17 @@
 package eu.kalodiodev.controlmycar.domains;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
+@Getter
+@Setter
 public class FuelRefill {
 
     @Id
@@ -14,7 +19,7 @@ public class FuelRefill {
     private Long id;
 
     @Column
-    private Date date;
+    private LocalDate date;
 
     @Column
     private Double odometer;
