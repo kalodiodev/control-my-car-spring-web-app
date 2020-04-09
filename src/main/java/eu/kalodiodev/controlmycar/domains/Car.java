@@ -15,6 +15,9 @@ public class Car {
     private Long id;
 
     @Column(nullable = false)
+    private String numberPlate;
+
+    @Column(nullable = false)
     private String manufacturer;
 
     @Column(nullable = false)
