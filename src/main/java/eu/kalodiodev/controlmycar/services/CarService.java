@@ -2,7 +2,7 @@ package eu.kalodiodev.controlmycar.services;
 
 import eu.kalodiodev.controlmycar.command.CarCommand;
 import eu.kalodiodev.controlmycar.domains.Car;
-import javassist.NotFoundException;
+import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 
 public interface CarService {
 
