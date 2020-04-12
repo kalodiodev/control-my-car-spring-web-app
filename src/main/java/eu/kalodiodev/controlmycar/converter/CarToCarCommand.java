@@ -19,7 +19,7 @@ public class CarToCarCommand implements Converter<Car, CarCommand> {
             return null;
         }
 
-        CarCommand carCommand = new CarCommand();
+        final CarCommand carCommand = new CarCommand();
         carCommand.setId(source.getId());
         carCommand.setNumberPlate(source.getNumberPlate());
         carCommand.setManufacturer(source.getManufacturer());
