@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,11 +35,24 @@ class JpaCarServiceImplTest {
 
     private Car car1;
     private static final Long CAR_ID = 1L;
+    private final Set<Car> carSet = new HashSet<>();
+
 
     @BeforeEach
     void setUp() {
         car1 = new Car();
         car1.setId(CAR_ID);
+
+        carSet.add(car1);
+    }
+
+    @Test
+    void find_all_cars_of_user() {
+        when(carRepository.findAllByUserId(anyLong())).thenReturn(carSet);
+
+        Set<Car> cars = carService.allOfUser(1L);
+
+        assertEquals(1, cars.size());
     }
 
     @Test

@@ -9,6 +9,7 @@ import eu.kalodiodev.controlmycar.services.CarService;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class JpaCarServiceImpl implements CarService {
@@ -35,5 +36,10 @@ public class JpaCarServiceImpl implements CarService {
         }
 
         return carOptional.get();
+    }
+
+    @Override
+    public Set<Car> allOfUser(Long userId) {
+        return carRepository.findAllByUserId(userId);
     }
 }
