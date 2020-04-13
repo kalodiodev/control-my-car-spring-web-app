@@ -25,6 +25,11 @@ public class JpaUserServiceImpl implements UserService {
     }
 
     @Override
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
     public User register(UserCommand userCommand) {
         User user = userCommandToUser.convert(userCommand);
 
@@ -35,6 +40,6 @@ public class JpaUserServiceImpl implements UserService {
         String password = passwordEncoder.encode(user.getPassword());
         user.setPassword(password);
 
-        return userRepository.save(user);
+        return save(user);
     }
 }

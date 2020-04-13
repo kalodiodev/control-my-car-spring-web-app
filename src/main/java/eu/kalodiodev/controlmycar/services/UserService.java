@@ -5,5 +5,7 @@ import eu.kalodiodev.controlmycar.domains.User;
 
 public interface UserService {
 
+    User save(User user);
+
     User register(UserCommand userCommand);
 }

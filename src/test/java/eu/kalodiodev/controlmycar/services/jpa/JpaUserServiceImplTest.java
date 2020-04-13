@@ -42,6 +42,13 @@ class JpaUserServiceImplTest {
     }
 
     @Test
+    void save_user() {
+        when(userRepository.save(any(User.class))).thenReturn(user1);
+
+        assertEquals(user1, userService.save(user1));
+    }
+
+    @Test
     void register_user_command() {
         user1.setPassword("password");
 
