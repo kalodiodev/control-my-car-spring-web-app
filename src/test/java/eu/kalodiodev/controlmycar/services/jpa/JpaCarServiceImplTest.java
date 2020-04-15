@@ -35,6 +35,7 @@ class JpaCarServiceImplTest {
 
     private Car car1;
     private static final Long CAR_ID = 1L;
+    private static final Long USER_ID = 1L;
     private final Set<Car> carSet = new HashSet<>();
 
 
@@ -60,6 +61,13 @@ class JpaCarServiceImplTest {
         when(carRepository.findById(CAR_ID)).thenReturn(Optional.of(car1));
 
         assertEquals(car1, carService.findById(CAR_ID));
+    }
+
+    @Test
+    void find_car_by_user_id_and_car_id() {
+        when(carRepository.findCarByIdAndUserId(CAR_ID, USER_ID)).thenReturn(Optional.of(car1));
+
+        assertEquals(car1, carService.findByUserIdAndCarId(USER_ID, CAR_ID));
     }
 
     @Test

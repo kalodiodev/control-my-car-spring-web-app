@@ -15,4 +15,6 @@ public interface CarService {
     Set<Car> allOfUser(Long userId);
 
     void update(CarCommand carCommand);
+
+    Car findByUserIdAndCarId(Long userId, Long carId);
 }

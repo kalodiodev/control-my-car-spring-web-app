@@ -39,6 +39,17 @@ public class JpaCarServiceImpl implements CarService {
     }
 
     @Override
+    public Car findByUserIdAndCarId(Long userId, Long carId) {
+        Optional<Car> carOptional = carRepository.findCarByIdAndUserId(carId, userId);
+
+        if (carOptional.isEmpty()) {
+            throw new NotFoundException("Car not found for given user");
+        }
+
+        return carOptional.get();
+    }
+
+    @Override
     public Set<Car> allOfUser(Long userId) {
         return carRepository.findAllByUserId(userId);
     }
