@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -75,5 +75,19 @@ class JpaCarServiceImplTest {
         when(carRepository.save(any(Car.class))).thenReturn(car1);
 
         assertEquals(car1, carService.save(new CarCommand()));
+    }
+
+    @Test
+    void update_car() {
+        CarCommand carCommand = new CarCommand();
+        carCommand.setId(CAR_ID);
+        carCommand.setNumberPlate("AAA-2345");
+
+        when(carRepository.findById(CAR_ID)).thenReturn(Optional.of(car1));
+        when(carCommandToCar.convert(any(CarCommand.class))).thenReturn(car1);
+
+        carService.update(carCommand);
+
+        verify(carRepository, times(1)).save(any(Car.class));
     }
 }

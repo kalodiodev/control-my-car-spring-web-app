@@ -42,4 +42,11 @@ public class JpaCarServiceImpl implements CarService {
     public Set<Car> allOfUser(Long userId) {
         return carRepository.findAllByUserId(userId);
     }
+
+    @Override
+    public void update(CarCommand carCommand) {
+        findById(carCommand.getId());
+
+        carRepository.save(carCommandToCar.convert(carCommand));
+    }
 }

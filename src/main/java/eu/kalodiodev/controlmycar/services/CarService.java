@@ -13,4 +13,6 @@ public interface CarService {
     Car findById(Long id) throws NotFoundException;
 
     Set<Car> allOfUser(Long userId);
+
+    void update(CarCommand carCommand);
 }
