@@ -17,4 +17,6 @@ public interface CarService {
     void update(CarCommand carCommand);
 
     Car findByUserIdAndCarId(Long userId, Long carId);
+
+    void deleteByUserIdAndCarId(Long userId, Long carId);
 }

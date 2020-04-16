@@ -98,4 +98,11 @@ class JpaCarServiceImplTest {
 
         verify(carRepository, times(1)).save(any(Car.class));
     }
+
+    @Test
+    void delete_car_by_id_and_user_id() {
+        carService.deleteByUserIdAndCarId(USER_ID, CAR_ID);
+
+        verify(carRepository, times(1)).deleteByIdAndUserId(CAR_ID, USER_ID);
+    }
 }

@@ -60,4 +60,8 @@ public class JpaCarServiceImpl implements CarService {
 
         carRepository.save(carCommandToCar.convert(carCommand));
     }
+
+    public void deleteByUserIdAndCarId(Long userId, Long carId) {
+        carRepository.deleteByIdAndUserId(carId, userId);
+    }
 }
