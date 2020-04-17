@@ -19,8 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,5 +81,23 @@ public class CarControllerTest {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.model", is("Micra")));
+    }
+
+    @Test
+    void update_car() throws Exception {
+        CarCommand carCommand = new CarCommand();
+        carCommand.setManufacturer("Nissan");
+        carCommand.setModel("Micra");
+        carCommand.setBoughtPrice(10000d);
+        carCommand.setInitialOdometer(1000d);
+        carCommand.setManufacturedYear(2009);
+        carCommand.setOwnedYear(2010);
+        carCommand.setNumberPlate("AAA-1234");
+
+        mockMvc.perform(patch("/users/1/cars/3")
+                .content(om.writeValueAsString(carCommand))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is("success")));
     }
 }

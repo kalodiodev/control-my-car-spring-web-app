@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @RestController
 public class CarController {
 
@@ -28,5 +30,19 @@ public class CarController {
         command.setUserId(userId);
 
         return new ResponseEntity<>(carToCarCommand.convert(carService.save(command)), HttpStatus.CREATED);
+    }
+
+    @PatchMapping(value = "/users/{userId}/cars/{carId}")
+    public HashMap<String, String> updateCar(@PathVariable Long userId, @PathVariable Long carId, @RequestBody CarCommand command) {
+        command.setUserId(userId);
+        command.setId(carId);
+
+        carService.update(command);
+
+        HashMap<String, String> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "Car updated successfully");
+
+        return response;
     }
 }
