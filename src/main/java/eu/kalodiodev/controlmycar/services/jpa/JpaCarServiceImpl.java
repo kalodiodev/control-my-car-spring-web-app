@@ -8,6 +8,7 @@ import eu.kalodiodev.controlmycar.repositories.CarRepository;
 import eu.kalodiodev.controlmycar.services.CarService;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.Set;
 
@@ -61,6 +62,8 @@ public class JpaCarServiceImpl implements CarService {
         carRepository.save(carCommandToCar.convert(carCommand));
     }
 
+    @Transactional
+    @Override
     public void deleteByUserIdAndCarId(Long userId, Long carId) {
         carRepository.deleteByIdAndUserId(carId, userId);
     }

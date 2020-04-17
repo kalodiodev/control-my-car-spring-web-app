@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -99,5 +99,14 @@ public class CarControllerTest {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is("success")));
+    }
+
+    @Test
+    void delete_car() throws Exception {
+        mockMvc.perform(delete("/users/1/cars/3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is("success")));
+
+        verify(carService, times(1)).deleteByUserIdAndCarId(1L, 3L);
     }
 }

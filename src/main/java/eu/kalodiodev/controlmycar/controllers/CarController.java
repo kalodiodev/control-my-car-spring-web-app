@@ -45,4 +45,15 @@ public class CarController {
 
         return response;
     }
+
+    @DeleteMapping(value = "/users/{userId}/cars/{carId}")
+    public HashMap<String, String> deleteCar(@PathVariable Long userId, @PathVariable Long carId) {
+        carService.deleteByUserIdAndCarId(userId, carId);
+
+        HashMap<String, String> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "Car deleted successfully");
+
+        return response;
+    }
 }
