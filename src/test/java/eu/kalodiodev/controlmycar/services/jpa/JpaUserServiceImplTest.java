@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class JpaUserServiceImplTest {
@@ -43,7 +43,7 @@ class JpaUserServiceImplTest {
 
     @Test
     void save_user() {
-        when(userRepository.save(any(User.class))).thenReturn(user1);
+        given(userRepository.save(any(User.class))).willReturn(user1);
 
         assertEquals(user1, userService.save(user1));
     }
@@ -52,9 +52,9 @@ class JpaUserServiceImplTest {
     void register_user_command() {
         user1.setPassword("password");
 
-        when(userRepository.save(any(User.class))).thenReturn(user1);
-        when(userDtoToUser.convert(any(UserDto.class))).thenReturn(user1);
-        when(passwordEncoder.encode(anyString())).thenReturn("asdffdsadf");
+        given(userRepository.save(any(User.class))).willReturn(user1);
+        given(userDtoToUser.convert(any(UserDto.class))).willReturn(user1);
+        given(passwordEncoder.encode(anyString())).willReturn("asdffdsadf");
 
         assertEquals(user1, userService.register(new UserDto()));
     }

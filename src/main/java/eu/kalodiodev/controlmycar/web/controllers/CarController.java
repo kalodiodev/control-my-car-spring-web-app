@@ -1,7 +1,6 @@
 package eu.kalodiodev.controlmycar.web.controllers;
 
 import eu.kalodiodev.controlmycar.web.model.CarDto;
-import eu.kalodiodev.controlmycar.converter.CarToCarDto;
 import eu.kalodiodev.controlmycar.services.CarService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,23 +12,21 @@ import java.util.HashMap;
 public class CarController {
 
     private final CarService carService;
-    private final CarToCarDto carToCarDto;
 
-    public CarController(CarService carService, CarToCarDto carToCarDto) {
+    public CarController(CarService carService) {
         this.carService = carService;
-        this.carToCarDto = carToCarDto;
     }
 
     @GetMapping("/users/{userId}/cars/{carId}")
     public CarDto findCar(@PathVariable Long userId, @PathVariable Long carId) {
-        return carToCarDto.convert(carService.findByUserIdAndCarId(userId, carId));
+        return carService.findByUserIdAndCarId(userId, carId);
     }
 
     @PostMapping("/users/{userId}/cars")
-    public ResponseEntity<CarDto> addCar(@PathVariable Long userId, @RequestBody CarDto command) {
-        command.setUserId(userId);
+    public ResponseEntity<CarDto> addCar(@PathVariable Long userId, @RequestBody CarDto carDto) {
+        carDto.setUserId(userId);
 
-        return new ResponseEntity<>(carToCarDto.convert(carService.save(command)), HttpStatus.CREATED);
+        return new ResponseEntity<>(carService.save(carDto), HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/users/{userId}/cars/{carId}")

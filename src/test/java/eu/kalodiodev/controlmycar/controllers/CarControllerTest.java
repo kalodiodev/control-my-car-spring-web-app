@@ -3,7 +3,6 @@ package eu.kalodiodev.controlmycar.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.kalodiodev.controlmycar.web.controllers.CarController;
 import eu.kalodiodev.controlmycar.web.model.CarDto;
-import eu.kalodiodev.controlmycar.converter.CarToCarDto;
 import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.services.CarService;
 import org.junit.jupiter.api.Test;
@@ -27,9 +26,6 @@ public class CarControllerTest {
     @MockBean
     CarService carService;
 
-    @MockBean
-    CarToCarDto carToCarDto;
-
     @Autowired
     ObjectMapper om;
 
@@ -44,8 +40,7 @@ public class CarControllerTest {
         CarDto carDto = new CarDto();
         carDto.setId(1L);
 
-        given(carService.findByUserIdAndCarId(1L, 1L)).willReturn(car);
-        given(carToCarDto.convert(car)).willReturn(carDto);
+        given(carService.findByUserIdAndCarId(1L, 1L)).willReturn(carDto);
 
         mockMvc.perform(get("/users/1/cars/1"))
                 .andExpect(status().isOk())
@@ -57,8 +52,7 @@ public class CarControllerTest {
 
         CarDto carDto = getValidCarDto();
 
-        given(carService.save(any(CarDto.class))).willReturn(new Car());
-        given(carToCarDto.convert(any(Car.class))).willReturn(carDto);
+        given(carService.save(any(CarDto.class))).willReturn(carDto);
 
         mockMvc.perform(post("/users/1/cars")
                 .content(om.writeValueAsString(carDto))

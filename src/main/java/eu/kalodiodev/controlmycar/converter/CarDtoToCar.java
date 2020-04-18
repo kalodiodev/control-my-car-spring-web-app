@@ -5,20 +5,14 @@ import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.domains.User;
 import lombok.Synchronized;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CarDtoToCar implements Converter<CarDto, Car> {
 
     @Synchronized
-    @Nullable
     @Override
-    public Car convert(@Nullable CarDto source) {
-
-        if (source == null) {
-            return null;
-        }
+    public Car convert(CarDto source) {
 
         final Car car = new Car();
         car.setId(source.getId());

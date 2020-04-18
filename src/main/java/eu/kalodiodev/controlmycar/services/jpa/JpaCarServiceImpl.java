@@ -1,5 +1,6 @@
 package eu.kalodiodev.controlmycar.services.jpa;
 
+import eu.kalodiodev.controlmycar.converter.CarToCarDto;
 import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.converter.CarDtoToCar;
 import eu.kalodiodev.controlmycar.domains.Car;
@@ -9,57 +10,54 @@ import eu.kalodiodev.controlmycar.services.CarService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class JpaCarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
     private final CarDtoToCar carDtoToCar;
+    private final CarToCarDto carToCarDto;
 
-    public JpaCarServiceImpl(CarRepository carRepository, CarDtoToCar carDtoToCar) {
+    public JpaCarServiceImpl(CarRepository carRepository, CarDtoToCar carDtoToCar, CarToCarDto carToCarDto) {
         this.carRepository = carRepository;
         this.carDtoToCar = carDtoToCar;
+        this.carToCarDto = carToCarDto;
     }
 
     @Override
-    public Car save(CarDto carDto) {
-        return carRepository.save(carDtoToCar.convert(carDto));
+    public CarDto save(CarDto carDto) {
+        return carToCarDto.convert(carRepository.save(carDtoToCar.convert(carDto)));
     }
 
     @Override
-    public Car findById(Long id) throws NotFoundException {
-        Optional<Car> carOptional = carRepository.findById(id);
+    public CarDto findById(Long id) throws NotFoundException {
+        Car car = carRepository.findById(id).orElseThrow(NotFoundException::new);
 
-        if (carOptional.isEmpty()) {
-            throw new NotFoundException("Car not found");
-        }
-
-        return carOptional.get();
+        return carToCarDto.convert(car);
     }
 
     @Override
-    public Car findByUserIdAndCarId(Long userId, Long carId) {
-        Optional<Car> carOptional = carRepository.findCarByIdAndUserId(carId, userId);
+    public CarDto findByUserIdAndCarId(Long userId, Long carId) {
+        Car car = carRepository.findCarByIdAndUserId(carId, userId).orElseThrow(NotFoundException::new);
 
-        if (carOptional.isEmpty()) {
-            throw new NotFoundException("Car not found for given user");
-        }
-
-        return carOptional.get();
+        return carToCarDto.convert(car);
     }
 
     @Override
-    public Set<Car> allOfUser(Long userId) {
-        return carRepository.findAllByUserId(userId);
+    public Set<CarDto> allOfUser(Long userId) {
+        return carRepository.findAllByUserId(userId)
+                .stream()
+                .map(carToCarDto::convert)
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public void update(CarDto carDto) {
+    public CarDto update(CarDto carDto) {
         findById(carDto.getId());
 
-        carRepository.save(carDtoToCar.convert(carDto));
+        return carToCarDto.convert(carRepository.save(carDtoToCar.convert(carDto)));
     }
 
     @Transactional
