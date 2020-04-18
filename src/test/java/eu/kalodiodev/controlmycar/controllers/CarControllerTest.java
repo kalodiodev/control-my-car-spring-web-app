@@ -42,7 +42,7 @@ public class CarControllerTest {
 
         given(carService.findByUserIdAndCarId(1L, 1L)).willReturn(carDto);
 
-        mockMvc.perform(get("/users/1/cars/1"))
+        mockMvc.perform(get("/api/v1/users/1/cars/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)));
     }
@@ -54,7 +54,7 @@ public class CarControllerTest {
 
         given(carService.save(any(CarDto.class))).willReturn(carDto);
 
-        mockMvc.perform(post("/users/1/cars")
+        mockMvc.perform(post("/api/v1/users/1/cars")
                 .content(om.writeValueAsString(carDto))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -65,18 +65,16 @@ public class CarControllerTest {
     void update_car() throws Exception {
         CarDto carDto = getValidCarDto();
 
-        mockMvc.perform(patch("/users/1/cars/3")
+        mockMvc.perform(patch("/api/v1/users/1/cars/3")
                 .content(om.writeValueAsString(carDto))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is("success")));
+                .andExpect(status().isNoContent());
     }
 
     @Test
     void delete_car() throws Exception {
-        mockMvc.perform(delete("/users/1/cars/3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is("success")));
+        mockMvc.perform(delete("/api/v1/users/1/cars/3"))
+                .andExpect(status().isNoContent());
 
         verify(carService, times(1)).deleteByUserIdAndCarId(1L, 3L);
     }
