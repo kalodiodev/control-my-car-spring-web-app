@@ -1,7 +1,7 @@
 package eu.kalodiodev.controlmycar.services.jpa;
 
-import eu.kalodiodev.controlmycar.command.CarCommand;
-import eu.kalodiodev.controlmycar.converter.CarCommandToCar;
+import eu.kalodiodev.controlmycar.web.model.CarDto;
+import eu.kalodiodev.controlmycar.converter.CarDtoToCar;
 import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.repositories.CarRepository;
@@ -16,16 +16,16 @@ import java.util.Set;
 public class JpaCarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
-    private final CarCommandToCar carCommandToCar;
+    private final CarDtoToCar carDtoToCar;
 
-    public JpaCarServiceImpl(CarRepository carRepository, CarCommandToCar carCommandToCar) {
+    public JpaCarServiceImpl(CarRepository carRepository, CarDtoToCar carDtoToCar) {
         this.carRepository = carRepository;
-        this.carCommandToCar = carCommandToCar;
+        this.carDtoToCar = carDtoToCar;
     }
 
     @Override
-    public Car save(CarCommand carCommand) {
-        return carRepository.save(carCommandToCar.convert(carCommand));
+    public Car save(CarDto carDto) {
+        return carRepository.save(carDtoToCar.convert(carDto));
     }
 
     @Override
@@ -56,10 +56,10 @@ public class JpaCarServiceImpl implements CarService {
     }
 
     @Override
-    public void update(CarCommand carCommand) {
-        findById(carCommand.getId());
+    public void update(CarDto carDto) {
+        findById(carDto.getId());
 
-        carRepository.save(carCommandToCar.convert(carCommand));
+        carRepository.save(carDtoToCar.convert(carDto));
     }
 
     @Transactional

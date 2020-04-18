@@ -1,5 +1,6 @@
 package eu.kalodiodev.controlmycar.command;
 
+import eu.kalodiodev.controlmycar.web.model.CarDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +25,7 @@ public class UserCommand {
     @NotBlank
     private String lastName;
 
-    private Set<CarCommand> cars = new HashSet<>();
+    private Set<CarDto> cars = new HashSet<>();
 
     @NotNull
     @Size(min = 8, max = 100)

@@ -1,7 +1,7 @@
 package eu.kalodiodev.controlmycar.converter;
 
 
-import eu.kalodiodev.controlmycar.command.CarCommand;
+import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.converter.values.CarValues;
 import eu.kalodiodev.controlmycar.domains.Car;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CarCommandToCarTest {
+public class CarDtoToCarTest {
 
-    private CarCommandToCar converter;
+    private CarDtoToCar converter;
 
     @BeforeEach
     public void setUp() throws Exception {
-        converter = new CarCommandToCar();
+        converter = new CarDtoToCar();
     }
 
     @Test
@@ -25,25 +25,25 @@ public class CarCommandToCarTest {
 
     @Test
     public void testEmptyObject() throws Exception {
-        assertNotNull(converter.convert(new CarCommand()));
+        assertNotNull(converter.convert(new CarDto()));
     }
 
     @Test
     public void convert() throws Exception {
         // given
-        CarCommand command = new CarCommand();
-        command.setId(CarValues.ID_VALUE);
-        command.setNumberPlate(CarValues.NUMBER_PLATE_VALUE);
-        command.setManufacturer(CarValues.MANUFACTURER_VALUE);
-        command.setModel(CarValues.MODEL_VALUE);
-        command.setManufacturedYear(CarValues.MANUFACTURED_YEAR_VALUE);
-        command.setOwnedYear(CarValues.OWNED_YEAR_VALUE);
-        command.setBoughtPrice(CarValues.BOUGHT_PRICE_VALUE);
-        command.setInitialOdometer(CarValues.INITIAL_ODOMETER_VALUE);
-        command.setUserId(CarValues.USER_ID_VALUE);
+        CarDto carDto = new CarDto();
+        carDto.setId(CarValues.ID_VALUE);
+        carDto.setNumberPlate(CarValues.NUMBER_PLATE_VALUE);
+        carDto.setManufacturer(CarValues.MANUFACTURER_VALUE);
+        carDto.setModel(CarValues.MODEL_VALUE);
+        carDto.setManufacturedYear(CarValues.MANUFACTURED_YEAR_VALUE);
+        carDto.setOwnedYear(CarValues.OWNED_YEAR_VALUE);
+        carDto.setBoughtPrice(CarValues.BOUGHT_PRICE_VALUE);
+        carDto.setInitialOdometer(CarValues.INITIAL_ODOMETER_VALUE);
+        carDto.setUserId(CarValues.USER_ID_VALUE);
 
         // When
-        Car car = converter.convert(command);
+        Car car = converter.convert(carDto);
 
         // then
         assertNotNull(car);

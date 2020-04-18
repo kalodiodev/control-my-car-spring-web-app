@@ -1,4 +1,4 @@
-package eu.kalodiodev.controlmycar.controllers;
+package eu.kalodiodev.controlmycar.web.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

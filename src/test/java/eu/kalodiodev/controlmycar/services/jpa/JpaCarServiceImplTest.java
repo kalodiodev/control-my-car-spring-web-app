@@ -1,7 +1,7 @@
 package eu.kalodiodev.controlmycar.services.jpa;
 
-import eu.kalodiodev.controlmycar.command.CarCommand;
-import eu.kalodiodev.controlmycar.converter.CarCommandToCar;
+import eu.kalodiodev.controlmycar.web.model.CarDto;
+import eu.kalodiodev.controlmycar.converter.CarDtoToCar;
 import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.repositories.CarRepository;
@@ -28,7 +28,7 @@ class JpaCarServiceImplTest {
     CarRepository carRepository;
 
     @Mock
-    CarCommandToCar carCommandToCar;
+    CarDtoToCar carCommandToCar;
 
     @InjectMocks
     JpaCarServiceImpl carService;
@@ -79,20 +79,20 @@ class JpaCarServiceImplTest {
 
     @Test
     void save_car_command() {
-        when(carCommandToCar.convert(any(CarCommand.class))).thenReturn(new Car());
+        when(carCommandToCar.convert(any(CarDto.class))).thenReturn(new Car());
         when(carRepository.save(any(Car.class))).thenReturn(car1);
 
-        assertEquals(car1, carService.save(new CarCommand()));
+        assertEquals(car1, carService.save(new CarDto()));
     }
 
     @Test
     void update_car() {
-        CarCommand carCommand = new CarCommand();
+        CarDto carCommand = new CarDto();
         carCommand.setId(CAR_ID);
         carCommand.setNumberPlate("AAA-2345");
 
         when(carRepository.findById(CAR_ID)).thenReturn(Optional.of(car1));
-        when(carCommandToCar.convert(any(CarCommand.class))).thenReturn(car1);
+        when(carCommandToCar.convert(any(CarDto.class))).thenReturn(car1);
 
         carService.update(carCommand);
 

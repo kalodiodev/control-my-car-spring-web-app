@@ -1,60 +1,51 @@
 package eu.kalodiodev.controlmycar.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.kalodiodev.controlmycar.command.CarCommand;
-import eu.kalodiodev.controlmycar.converter.CarToCarCommand;
+import eu.kalodiodev.controlmycar.web.controllers.CarController;
+import eu.kalodiodev.controlmycar.web.model.CarDto;
+import eu.kalodiodev.controlmycar.converter.CarToCarDto;
 import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.services.CarService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(CarController.class)
 public class CarControllerTest {
 
-    @Mock
+    @MockBean
     CarService carService;
 
-    @Mock
-    CarToCarCommand carToCarCommand;
+    @MockBean
+    CarToCarDto carToCarDto;
 
-    @InjectMocks
-    CarController controller;
+    @Autowired
+    ObjectMapper om;
 
-    private static final ObjectMapper om = new ObjectMapper();
-
+    @Autowired
     MockMvc mockMvc;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .build();
-    }
 
     @Test
     void find_car() throws Exception {
         Car car = new Car();
         car.setId(1L);
 
-        CarCommand carCommand = new CarCommand();
-        carCommand.setId(1L);
+        CarDto carDto = new CarDto();
+        carDto.setId(1L);
 
-        when(carService.findByUserIdAndCarId(1L, 1L)).thenReturn(car);
-        when(carToCarCommand.convert(car)).thenReturn(carCommand);
+        given(carService.findByUserIdAndCarId(1L, 1L)).willReturn(car);
+        given(carToCarDto.convert(car)).willReturn(carDto);
 
         mockMvc.perform(get("/users/1/cars/1"))
                 .andExpect(status().isOk())
@@ -64,20 +55,13 @@ public class CarControllerTest {
     @Test
     void save_car() throws Exception {
 
-        CarCommand carCommand = new CarCommand();
-        carCommand.setManufacturer("Nissan");
-        carCommand.setModel("Micra");
-        carCommand.setBoughtPrice(10000d);
-        carCommand.setInitialOdometer(1000d);
-        carCommand.setManufacturedYear(2009);
-        carCommand.setOwnedYear(2010);
-        carCommand.setNumberPlate("AAA-1234");
+        CarDto carDto = getValidCarDto();
 
-        when(carService.save(any(CarCommand.class))).thenReturn(new Car());
-        when(carToCarCommand.convert(any(Car.class))).thenReturn(carCommand);
+        given(carService.save(any(CarDto.class))).willReturn(new Car());
+        given(carToCarDto.convert(any(Car.class))).willReturn(carDto);
 
         mockMvc.perform(post("/users/1/cars")
-                .content(om.writeValueAsString(carCommand))
+                .content(om.writeValueAsString(carDto))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.model", is("Micra")));
@@ -85,17 +69,10 @@ public class CarControllerTest {
 
     @Test
     void update_car() throws Exception {
-        CarCommand carCommand = new CarCommand();
-        carCommand.setManufacturer("Nissan");
-        carCommand.setModel("Micra");
-        carCommand.setBoughtPrice(10000d);
-        carCommand.setInitialOdometer(1000d);
-        carCommand.setManufacturedYear(2009);
-        carCommand.setOwnedYear(2010);
-        carCommand.setNumberPlate("AAA-1234");
+        CarDto carDto = getValidCarDto();
 
         mockMvc.perform(patch("/users/1/cars/3")
-                .content(om.writeValueAsString(carCommand))
+                .content(om.writeValueAsString(carDto))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is("success")));
@@ -108,5 +85,17 @@ public class CarControllerTest {
                 .andExpect(jsonPath("$.status", is("success")));
 
         verify(carService, times(1)).deleteByUserIdAndCarId(1L, 3L);
+    }
+
+    CarDto getValidCarDto() {
+        return CarDto.builder()
+                .manufacturer("Nissan")
+                .model("Micra")
+                .boughtPrice(10000d)
+                .initialOdometer(1000d)
+                .manufacturedYear(2009)
+                .ownedYear(2010)
+                .numberPlate("AAA-1234")
+                .build();
     }
 }

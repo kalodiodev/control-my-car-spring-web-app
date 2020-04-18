@@ -1,6 +1,6 @@
 package eu.kalodiodev.controlmycar.bootstrap;
 
-import eu.kalodiodev.controlmycar.converter.CarToCarCommand;
+import eu.kalodiodev.controlmycar.converter.CarToCarDto;
 import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.domains.Role;
 import eu.kalodiodev.controlmycar.domains.User;
@@ -17,13 +17,13 @@ public class DataLoader implements CommandLineRunner {
     private final RoleService roleService;
     private final UserService userService;
     private final CarService carService;
-    private final CarToCarCommand carToCarCommand;
+    private final CarToCarDto carToCarDto;
 
-    public DataLoader(RoleService roleService, UserService userService, CarService carService, CarToCarCommand carToCarCommand) {
+    public DataLoader(RoleService roleService, UserService userService, CarService carService, CarToCarDto carToCarDto) {
         this.roleService = roleService;
         this.userService = userService;
         this.carService = carService;
-        this.carToCarCommand = carToCarCommand;
+        this.carToCarDto = carToCarDto;
     }
 
     @Override
@@ -62,6 +62,6 @@ public class DataLoader implements CommandLineRunner {
         car.setBoughtPrice(33100d);
         car.setUser(user);
 
-        carService.save(carToCarCommand.convert(car));
+        carService.save(carToCarDto.convert(car));
     }
 }

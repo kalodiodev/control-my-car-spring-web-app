@@ -1,6 +1,6 @@
 package eu.kalodiodev.controlmycar.converter;
 
-import eu.kalodiodev.controlmycar.command.CarCommand;
+import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.command.UserCommand;
 import eu.kalodiodev.controlmycar.domains.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ public class UserCommandToUserTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        converter = new UserCommandToUser(new CarCommandToCar());
+        converter = new UserCommandToUser(new CarDtoToCar());
     }
 
     @Test
@@ -48,7 +48,7 @@ public class UserCommandToUserTest {
         command.setPassword(PASSWORD_VALUE);
         command.setPasswordConfirm(PASSWORD_VALUE);
 
-        CarCommand carCommand = new CarCommand();
+        CarDto carCommand = new CarDto();
         carCommand.setId(CAR_ID_VALUE);
 
         command.getCars().add(carCommand);

@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserCommandToUser implements Converter<UserCommand, User> {
 
-    private final CarCommandToCar carCommandToCar;
+    private final CarDtoToCar carCommandToCar;
 
-    public UserCommandToUser(CarCommandToCar carCommandToCar) {
+    public UserCommandToUser(CarDtoToCar carCommandToCar) {
         this.carCommandToCar = carCommandToCar;
     }
 

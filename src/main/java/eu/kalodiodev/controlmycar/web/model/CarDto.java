@@ -1,14 +1,12 @@
-package eu.kalodiodev.controlmycar.command;
+package eu.kalodiodev.controlmycar.web.model;
 
-import eu.kalodiodev.controlmycar.domains.User;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.*;
-
-@Getter
-@Setter
-public class CarCommand {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CarDto {
 
     private Long id;
     private String numberPlate;
@@ -19,5 +17,4 @@ public class CarCommand {
     private Double boughtPrice;
     private Double initialOdometer;
     private Long userId;
-
 }

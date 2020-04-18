@@ -1,6 +1,6 @@
 package eu.kalodiodev.controlmycar.converter;
 
-import eu.kalodiodev.controlmycar.command.CarCommand;
+import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.converter.values.CarValues;
 import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.domains.User;
@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CarToCarCommandTest {
+public class CarToCarDtoTest {
 
-    private CarToCarCommand converter;
+    private CarToCarDto converter;
 
     @BeforeEach
     public void setUp()throws Exception {
-        converter = new CarToCarCommand();
+        converter = new CarToCarDto();
     }
 
     @Test
@@ -46,18 +46,18 @@ public class CarToCarCommandTest {
         car.setUser(user);
 
         // when
-        CarCommand command = converter.convert(car);
+        CarDto carDto = converter.convert(car);
 
         // then
-        assertNotNull(command);
-        assertEquals(CarValues.ID_VALUE, command.getId());
-        assertEquals(CarValues.NUMBER_PLATE_VALUE, command.getNumberPlate());
-        assertEquals(CarValues.MANUFACTURER_VALUE, command.getManufacturer());
-        assertEquals(CarValues.MODEL_VALUE, command.getModel());
-        assertEquals(CarValues.MANUFACTURED_YEAR_VALUE, command.getManufacturedYear());
-        assertEquals(CarValues.OWNED_YEAR_VALUE, command.getOwnedYear());
-        assertEquals(CarValues.BOUGHT_PRICE_VALUE, command.getBoughtPrice());
-        assertEquals(CarValues.INITIAL_ODOMETER_VALUE, command.getInitialOdometer());
-        assertEquals(CarValues.USER_ID_VALUE, command.getUserId());
+        assertNotNull(carDto);
+        assertEquals(CarValues.ID_VALUE, carDto.getId());
+        assertEquals(CarValues.NUMBER_PLATE_VALUE, carDto.getNumberPlate());
+        assertEquals(CarValues.MANUFACTURER_VALUE, carDto.getManufacturer());
+        assertEquals(CarValues.MODEL_VALUE, carDto.getModel());
+        assertEquals(CarValues.MANUFACTURED_YEAR_VALUE, carDto.getManufacturedYear());
+        assertEquals(CarValues.OWNED_YEAR_VALUE, carDto.getOwnedYear());
+        assertEquals(CarValues.BOUGHT_PRICE_VALUE, carDto.getBoughtPrice());
+        assertEquals(CarValues.INITIAL_ODOMETER_VALUE, carDto.getInitialOdometer());
+        assertEquals(CarValues.USER_ID_VALUE, carDto.getUserId());
     }
 }
