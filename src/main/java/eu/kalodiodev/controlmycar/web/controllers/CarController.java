@@ -13,23 +13,23 @@ import java.util.HashMap;
 public class CarController {
 
     private final CarService carService;
-    private final CarToCarDto carToCarCommand;
+    private final CarToCarDto carToCarDto;
 
-    public CarController(CarService carService, CarToCarDto carToCarCommand) {
+    public CarController(CarService carService, CarToCarDto carToCarDto) {
         this.carService = carService;
-        this.carToCarCommand = carToCarCommand;
+        this.carToCarDto = carToCarDto;
     }
 
     @GetMapping("/users/{userId}/cars/{carId}")
     public CarDto findCar(@PathVariable Long userId, @PathVariable Long carId) {
-        return carToCarCommand.convert(carService.findByUserIdAndCarId(userId, carId));
+        return carToCarDto.convert(carService.findByUserIdAndCarId(userId, carId));
     }
 
     @PostMapping("/users/{userId}/cars")
     public ResponseEntity<CarDto> addCar(@PathVariable Long userId, @RequestBody CarDto command) {
         command.setUserId(userId);
 
-        return new ResponseEntity<>(carToCarCommand.convert(carService.save(command)), HttpStatus.CREATED);
+        return new ResponseEntity<>(carToCarDto.convert(carService.save(command)), HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/users/{userId}/cars/{carId}")

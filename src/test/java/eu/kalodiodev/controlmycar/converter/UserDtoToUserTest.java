@@ -1,7 +1,7 @@
 package eu.kalodiodev.controlmycar.converter;
 
 import eu.kalodiodev.controlmycar.web.model.CarDto;
-import eu.kalodiodev.controlmycar.command.UserCommand;
+import eu.kalodiodev.controlmycar.web.model.UserDto;
 import eu.kalodiodev.controlmycar.domains.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class UserCommandToUserTest {
+public class UserDtoToUserTest {
 
     private static final Long ID_VALUE = 1L;
     private static final String FIRST_NAME_VALUE = "John";
@@ -20,11 +20,11 @@ public class UserCommandToUserTest {
     private static final Long CAR_ID_VALUE = 1L;
 
 
-    private UserCommandToUser converter;
+    private UserDtoToUser converter;
 
     @BeforeEach
     public void setUp() throws Exception {
-        converter = new UserCommandToUser(new CarDtoToCar());
+        converter = new UserDtoToUser(new CarDtoToCar());
     }
 
     @Test
@@ -34,27 +34,27 @@ public class UserCommandToUserTest {
 
     @Test
     public void testEmptyObject() throws Exception {
-        assertNotNull(converter.convert(new UserCommand()));
+        assertNotNull(converter.convert(new UserDto()));
     }
 
     @Test
     public void convert() throws Exception {
         // given
-        UserCommand command = new UserCommand();
-        command.setId(ID_VALUE);
-        command.setFirstName(FIRST_NAME_VALUE);
-        command.setLastName(LAST_NAME_VALUE);
-        command.setEmail(EMAIL_VALUE);
-        command.setPassword(PASSWORD_VALUE);
-        command.setPasswordConfirm(PASSWORD_VALUE);
+        UserDto userDto = new UserDto();
+        userDto.setId(ID_VALUE);
+        userDto.setFirstName(FIRST_NAME_VALUE);
+        userDto.setLastName(LAST_NAME_VALUE);
+        userDto.setEmail(EMAIL_VALUE);
+        userDto.setPassword(PASSWORD_VALUE);
+        userDto.setPasswordConfirm(PASSWORD_VALUE);
 
-        CarDto carCommand = new CarDto();
-        carCommand.setId(CAR_ID_VALUE);
+        CarDto carDto = new CarDto();
+        carDto.setId(CAR_ID_VALUE);
 
-        command.getCars().add(carCommand);
+        userDto.getCars().add(carDto);
 
         // when
-        User user = converter.convert(command);
+        User user = converter.convert(userDto);
 
         // then
         assertNotNull(user);

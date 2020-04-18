@@ -1,7 +1,7 @@
 package eu.kalodiodev.controlmycar.services.jpa;
 
-import eu.kalodiodev.controlmycar.command.UserCommand;
-import eu.kalodiodev.controlmycar.converter.UserCommandToUser;
+import eu.kalodiodev.controlmycar.web.model.UserDto;
+import eu.kalodiodev.controlmycar.converter.UserDtoToUser;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.repositories.UserRepository;
 import eu.kalodiodev.controlmycar.services.UserService;
@@ -12,15 +12,15 @@ import org.springframework.stereotype.Service;
 public class JpaUserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserCommandToUser userCommandToUser;
+    private final UserDtoToUser userDtoToUser;
     private final PasswordEncoder passwordEncoder;
 
     public JpaUserServiceImpl(UserRepository userRepository,
-                              UserCommandToUser userCommandToUser,
+                              UserDtoToUser userDtoToUser,
                               PasswordEncoder passwordEncoder) {
 
         this.userRepository = userRepository;
-        this.userCommandToUser = userCommandToUser;
+        this.userDtoToUser = userDtoToUser;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -30,8 +30,8 @@ public class JpaUserServiceImpl implements UserService {
     }
 
     @Override
-    public User register(UserCommand userCommand) {
-        User user = userCommandToUser.convert(userCommand);
+    public User register(UserDto userDto) {
+        User user = userDtoToUser.convert(userDto);
 
         if (user == null) {
             return null;

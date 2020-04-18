@@ -1,7 +1,7 @@
 package eu.kalodiodev.controlmycar.services.jpa;
 
-import eu.kalodiodev.controlmycar.command.UserCommand;
-import eu.kalodiodev.controlmycar.converter.UserCommandToUser;
+import eu.kalodiodev.controlmycar.web.model.UserDto;
+import eu.kalodiodev.controlmycar.converter.UserDtoToUser;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ class JpaUserServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
-    private UserCommandToUser userCommandToUser;
+    private UserDtoToUser userDtoToUser;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -53,9 +53,9 @@ class JpaUserServiceImplTest {
         user1.setPassword("password");
 
         when(userRepository.save(any(User.class))).thenReturn(user1);
-        when(userCommandToUser.convert(any(UserCommand.class))).thenReturn(user1);
+        when(userDtoToUser.convert(any(UserDto.class))).thenReturn(user1);
         when(passwordEncoder.encode(anyString())).thenReturn("asdffdsadf");
 
-        assertEquals(user1, userService.register(new UserCommand()));
+        assertEquals(user1, userService.register(new UserDto()));
     }
 }

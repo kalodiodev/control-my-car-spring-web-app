@@ -1,8 +1,6 @@
-package eu.kalodiodev.controlmycar.command;
+package eu.kalodiodev.controlmycar.web.model;
 
-import eu.kalodiodev.controlmycar.web.model.CarDto;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -10,9 +8,11 @@ import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
-public class UserCommand {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserDto {
 
     private Long id;
 
