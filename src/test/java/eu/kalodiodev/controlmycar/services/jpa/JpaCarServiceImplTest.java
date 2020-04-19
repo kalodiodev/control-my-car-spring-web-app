@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.*;
 
@@ -99,7 +100,7 @@ class JpaCarServiceImplTest {
         given(carRepository.save(any(Car.class))).willReturn(new Car());
         given(carToCarDto.convert(any(Car.class))).willReturn(carDto);
 
-        assertEquals(carDto, carService.save(new CarDto()));
+        assertEquals(carDto, carService.save(USER_ID, new CarDto()));
     }
 
     @Test
@@ -108,7 +109,7 @@ class JpaCarServiceImplTest {
         when(carDtoToCar.convert(any(CarDto.class))).thenReturn(new Car());
         given(carToCarDto.convert(any(Car.class))).willReturn(carDto);
 
-        carService.update(carDto);
+        carService.update(USER_ID, CAR_ID, carDto);
 
         verify(carRepository, times(1)).save(any(Car.class));
     }

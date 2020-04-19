@@ -62,6 +62,6 @@ public class DataLoader implements CommandLineRunner {
         car.setBoughtPrice(33100d);
         car.setUser(user);
 
-        carService.save(carToCarDto.convert(car));
+        carService.save(user.getId(), carToCarDto.convert(car));
     }
 }

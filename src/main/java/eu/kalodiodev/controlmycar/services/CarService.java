@@ -7,13 +7,13 @@ import java.util.Set;
 
 public interface CarService {
 
-    CarDto save(CarDto carDto);
+    CarDto save(Long userId, CarDto carDto);
 
     CarDto findById(Long id) throws NotFoundException;
 
     Set<CarDto> allOfUser(Long userId);
 
-    CarDto update(CarDto carDto);
+    CarDto update(Long userId, Long carId, CarDto carDto);
 
     CarDto findByUserIdAndCarId(Long userId, Long carId);
 

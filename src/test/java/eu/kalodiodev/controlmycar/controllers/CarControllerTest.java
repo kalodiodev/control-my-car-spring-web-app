@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -52,7 +51,7 @@ public class CarControllerTest {
 
         CarDto carDto = getValidCarDto();
 
-        given(carService.save(any(CarDto.class))).willReturn(carDto);
+        given(carService.save(1L, carDto)).willReturn(carDto);
 
         mockMvc.perform(post("/api/v1/users/1/cars")
                 .content(om.writeValueAsString(carDto))

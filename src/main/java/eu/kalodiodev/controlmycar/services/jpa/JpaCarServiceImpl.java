@@ -27,7 +27,9 @@ public class JpaCarServiceImpl implements CarService {
     }
 
     @Override
-    public CarDto save(CarDto carDto) {
+    public CarDto save(Long userId, CarDto carDto) {
+        carDto.setUserId(userId);
+
         return carToCarDto.convert(carRepository.save(carDtoToCar.convert(carDto)));
     }
 
@@ -54,7 +56,10 @@ public class JpaCarServiceImpl implements CarService {
     }
 
     @Override
-    public CarDto update(CarDto carDto) {
+    public CarDto update(Long userId, Long carId, CarDto carDto) {
+        carDto.setId(carId);
+        carDto.setUserId(userId);
+
         findById(carDto.getId());
 
         return carToCarDto.convert(carRepository.save(carDtoToCar.convert(carDto)));
