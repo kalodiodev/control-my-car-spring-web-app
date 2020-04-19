@@ -1,6 +1,7 @@
 package eu.kalodiodev.controlmycar.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.web.controllers.CarController;
 import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.domains.Car;
@@ -47,6 +48,14 @@ public class CarControllerTest {
     }
 
     @Test
+    void find_car_not_found() throws Exception {
+        given(carService.findByUserIdAndCarId(1L, 1L)).willThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/api/v1/users/1/cars/1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void save_car() throws Exception {
 
         CarDto carDto = getValidCarDto();
@@ -71,9 +80,31 @@ public class CarControllerTest {
     }
 
     @Test
+    void update_car_not_found() throws Exception {
+        given(carService.update(anyLong(), anyLong(), any(CarDto.class))).willThrow(NotFoundException.class);
+
+        CarDto carDto = getValidCarDto();
+
+        mockMvc.perform(patch("/api/v1/users/1/cars/3")
+                .content(om.writeValueAsString(carDto))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void delete_car() throws Exception {
         mockMvc.perform(delete("/api/v1/users/1/cars/3"))
                 .andExpect(status().isNoContent());
+
+        verify(carService, times(1)).deleteByUserIdAndCarId(1L, 3L);
+    }
+
+    @Test
+    void delete_car_not_found() throws Exception {
+        doThrow(NotFoundException.class).when(carService).deleteByUserIdAndCarId(anyLong(), anyLong());
+
+        mockMvc.perform(delete("/api/v1/users/1/cars/3"))
+                .andExpect(status().isNotFound());
 
         verify(carService, times(1)).deleteByUserIdAndCarId(1L, 3L);
     }

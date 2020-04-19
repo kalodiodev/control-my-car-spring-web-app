@@ -34,13 +34,6 @@ public class JpaCarServiceImpl implements CarService {
     }
 
     @Override
-    public CarDto findById(Long id) throws NotFoundException {
-        Car car = carRepository.findById(id).orElseThrow(NotFoundException::new);
-
-        return carToCarDto.convert(car);
-    }
-
-    @Override
     public CarDto findByUserIdAndCarId(Long userId, Long carId) {
         Car car = carRepository.findCarByIdAndUserId(carId, userId).orElseThrow(NotFoundException::new);
 
@@ -56,18 +49,21 @@ public class JpaCarServiceImpl implements CarService {
     }
 
     @Override
-    public CarDto update(Long userId, Long carId, CarDto carDto) {
+    public CarDto update(Long userId, Long carId, CarDto carDto) throws NotFoundException {
         carDto.setId(carId);
         carDto.setUserId(userId);
 
-        findById(carDto.getId());
+        findByUserIdAndCarId(userId, carId);
 
         return carToCarDto.convert(carRepository.save(carDtoToCar.convert(carDto)));
     }
 
     @Transactional
     @Override
-    public void deleteByUserIdAndCarId(Long userId, Long carId) {
+    public void deleteByUserIdAndCarId(Long userId, Long carId) throws NotFoundException {
+
+        findByUserIdAndCarId(userId, carId);
+
         carRepository.deleteByIdAndUserId(carId, userId);
     }
 }

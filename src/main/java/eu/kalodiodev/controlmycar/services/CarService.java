@@ -9,13 +9,11 @@ public interface CarService {
 
     CarDto save(Long userId, CarDto carDto);
 
-    CarDto findById(Long id) throws NotFoundException;
+    CarDto findByUserIdAndCarId(Long userId, Long carId);
 
     Set<CarDto> allOfUser(Long userId);
 
-    CarDto update(Long userId, Long carId, CarDto carDto);
+    CarDto update(Long userId, Long carId, CarDto carDto) throws NotFoundException;
 
-    CarDto findByUserIdAndCarId(Long userId, Long carId);
-
-    void deleteByUserIdAndCarId(Long userId, Long carId);
+    void deleteByUserIdAndCarId(Long userId, Long carId) throws NotFoundException;
 }

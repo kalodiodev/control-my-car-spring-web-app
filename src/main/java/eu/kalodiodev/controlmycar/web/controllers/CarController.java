@@ -23,7 +23,6 @@ public class CarController {
     }
 
     @PostMapping("users/{userId}/cars")
-    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<CarDto> addCar(@PathVariable Long userId, @RequestBody CarDto carDto) {
 
         return new ResponseEntity<>(carService.save(userId, carDto), HttpStatus.CREATED);

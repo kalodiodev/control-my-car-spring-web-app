@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.*;
 
@@ -72,14 +71,6 @@ class JpaCarServiceImplTest {
     }
 
     @Test
-    void find_car_by_id() throws NotFoundException {
-        given(carRepository.findById(CAR_ID)).willReturn(Optional.of(new Car()));
-        given(carToCarDto.convert(any(Car.class))).willReturn(carDto);
-
-        assertEquals(carDto, carService.findById(CAR_ID));
-    }
-
-    @Test
     void find_car_by_user_id_and_car_id() {
         given(carRepository.findCarByIdAndUserId(CAR_ID, USER_ID)).willReturn(Optional.of(new Car()));
         given(carToCarDto.convert(any(Car.class))).willReturn(carDto);
@@ -89,9 +80,9 @@ class JpaCarServiceImplTest {
 
     @Test
     void not_found_car() {
-        when(carRepository.findById(anyLong())).thenReturn(Optional.empty());
+        given(carRepository.findCarByIdAndUserId(anyLong(), anyLong())).willReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> carService.findById(CAR_ID));
+        assertThrows(NotFoundException.class, () -> carService.findByUserIdAndCarId(USER_ID, CAR_ID));
     }
 
     @Test
@@ -105,19 +96,37 @@ class JpaCarServiceImplTest {
 
     @Test
     void update_car() {
-        when(carRepository.findById(CAR_ID)).thenReturn(Optional.of(new Car()));
-        when(carDtoToCar.convert(any(CarDto.class))).thenReturn(new Car());
+        given(carRepository.findCarByIdAndUserId(CAR_ID, USER_ID)).willReturn(Optional.of(new Car()));
+        given(carDtoToCar.convert(any(CarDto.class))).willReturn(new Car());
+        given(carRepository.save(any(Car.class))).willReturn(new Car());
         given(carToCarDto.convert(any(Car.class))).willReturn(carDto);
 
-        carService.update(USER_ID, CAR_ID, carDto);
+        CarDto updatedCarDto = carService.update(USER_ID, CAR_ID, carDto);
 
+        assertEquals(carDto, updatedCarDto);
         verify(carRepository, times(1)).save(any(Car.class));
     }
 
     @Test
+    void update_car_not_found() {
+        given(carRepository.findCarByIdAndUserId(anyLong(), anyLong())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> carService.update(USER_ID, CAR_ID, new CarDto()));
+    }
+
+    @Test
     void delete_car_by_id_and_user_id() {
+        given(carRepository.findCarByIdAndUserId(anyLong(), anyLong())).willReturn(Optional.of(new Car()));
+
         carService.deleteByUserIdAndCarId(USER_ID, CAR_ID);
 
         verify(carRepository, times(1)).deleteByIdAndUserId(CAR_ID, USER_ID);
+    }
+
+    @Test
+    void delete_car_not_found() {
+        given(carRepository.findCarByIdAndUserId(anyLong(), anyLong())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> carService.deleteByUserIdAndCarId(USER_ID, CAR_ID));
     }
 }
