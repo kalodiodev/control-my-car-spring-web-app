@@ -60,10 +60,7 @@ public class JpaCarServiceImpl implements CarService {
 
     @Transactional
     @Override
-    public void deleteByUserIdAndCarId(Long userId, Long carId) throws NotFoundException {
-
-        findByUserIdAndCarId(userId, carId);
-
+    public void deleteByUserIdAndCarId(Long userId, Long carId) {
         carRepository.deleteByIdAndUserId(carId, userId);
     }
 }

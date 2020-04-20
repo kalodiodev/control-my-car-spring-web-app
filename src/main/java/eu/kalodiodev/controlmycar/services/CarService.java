@@ -15,5 +15,5 @@ public interface CarService {
 
     CarDto update(Long userId, Long carId, CarDto carDto) throws NotFoundException;
 
-    void deleteByUserIdAndCarId(Long userId, Long carId) throws NotFoundException;
+    void deleteByUserIdAndCarId(Long userId, Long carId);
 }

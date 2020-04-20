@@ -116,17 +116,8 @@ class JpaCarServiceImplTest {
 
     @Test
     void delete_car_by_id_and_user_id() {
-        given(carRepository.findCarByIdAndUserId(anyLong(), anyLong())).willReturn(Optional.of(new Car()));
-
         carService.deleteByUserIdAndCarId(USER_ID, CAR_ID);
 
         verify(carRepository, times(1)).deleteByIdAndUserId(CAR_ID, USER_ID);
-    }
-
-    @Test
-    void delete_car_not_found() {
-        given(carRepository.findCarByIdAndUserId(anyLong(), anyLong())).willReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> carService.deleteByUserIdAndCarId(USER_ID, CAR_ID));
     }
 }

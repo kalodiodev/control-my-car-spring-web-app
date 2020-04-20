@@ -99,16 +99,6 @@ public class CarControllerTest {
         verify(carService, times(1)).deleteByUserIdAndCarId(1L, 3L);
     }
 
-    @Test
-    void delete_car_not_found() throws Exception {
-        doThrow(NotFoundException.class).when(carService).deleteByUserIdAndCarId(anyLong(), anyLong());
-
-        mockMvc.perform(delete("/api/v1/users/1/cars/3"))
-                .andExpect(status().isNotFound());
-
-        verify(carService, times(1)).deleteByUserIdAndCarId(1L, 3L);
-    }
-
     CarDto getValidCarDto() {
         return CarDto.builder()
                 .manufacturer("Nissan")
