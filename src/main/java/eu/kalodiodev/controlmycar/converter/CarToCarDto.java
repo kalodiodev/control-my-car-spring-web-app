@@ -19,20 +19,20 @@ public class CarToCarDto implements Converter<Car, CarDto> {
             return null;
         }
 
-        final CarDto carCommand = new CarDto();
-        carCommand.setId(source.getId());
-        carCommand.setNumberPlate(source.getNumberPlate());
-        carCommand.setManufacturer(source.getManufacturer());
-        carCommand.setModel(source.getModel());
-        carCommand.setManufacturedYear(source.getManufacturedYear());
-        carCommand.setOwnedYear(source.getOwnedYear());
-        carCommand.setBoughtPrice(source.getBoughtPrice());
-        carCommand.setInitialOdometer(source.getInitialOdometer());
+        final CarDto carDto = new CarDto();
+        carDto.setId(source.getId());
+        carDto.setNumberPlate(source.getNumberPlate());
+        carDto.setManufacturer(source.getManufacturer());
+        carDto.setModel(source.getModel());
+        carDto.setManufacturedYear(source.getManufacturedYear());
+        carDto.setOwnedYear(source.getOwnedYear());
+        carDto.setBoughtPrice(source.getBoughtPrice());
+        carDto.setInitialOdometer(source.getInitialOdometer());
 
         if (source.getUser() != null) {
-            carCommand.setUserId(source.getUser().getId());
+            carDto.setUserId(source.getUser().getId());
         }
 
-        return carCommand;
+        return carDto;
     }
 }
