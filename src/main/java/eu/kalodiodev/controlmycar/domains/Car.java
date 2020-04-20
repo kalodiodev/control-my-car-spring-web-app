@@ -14,25 +14,25 @@ public class Car {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(20)")
     private String numberPlate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(110)")
     private String manufacturer;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(110)")
     private String model;
 
-    @Column(nullable = true)
+    @Column(columnDefinition = "integer default 0")
     private Integer manufacturedYear;
 
-    @Column(nullable = true)
+    @Column(columnDefinition = "integer default 0")
     private Integer ownedYear;
 
-    @Column
+    @Column(columnDefinition = "decimal(10,2) default 0.0")
     private Double boughtPrice;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "decimal(10,2)")
     private Double initialOdometer;
 
     @ManyToOne

@@ -6,6 +6,7 @@ import eu.kalodiodev.controlmycar.web.controllers.CarController;
 import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.services.CarService;
+import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
@@ -97,6 +99,31 @@ public class CarControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(carService, times(1)).deleteByUserIdAndCarId(1L, 3L);
+    }
+
+    @Test
+    void validate_add_new_car_manufacturer() throws Exception {
+        // Manufacturer Required
+        CarDto carDto = getValidCarDto();
+        carDto.setManufacturer("");
+        post_a_new_car(carDto, status().is4xxClientError());
+
+        // Manufacturer Max Length
+        carDto = getValidCarDto();
+        carDto.setManufacturer(RandomString.make(101));
+        post_a_new_car(carDto, status().is4xxClientError());
+
+        // Manufacturer Min Length
+        carDto = getValidCarDto();
+        carDto.setManufacturer(RandomString.make(2));
+        post_a_new_car(carDto, status().is4xxClientError());
+    }
+
+    void post_a_new_car(CarDto carDto, ResultMatcher status) throws Exception {
+        mockMvc.perform(post("/api/v1/users/1/cars")
+                .content(om.writeValueAsString(carDto))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status);
     }
 
     CarDto getValidCarDto() {

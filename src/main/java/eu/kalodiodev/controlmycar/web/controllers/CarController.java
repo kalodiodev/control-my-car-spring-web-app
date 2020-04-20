@@ -4,7 +4,7 @@ import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.services.CarService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,14 +23,14 @@ public class CarController {
     }
 
     @PostMapping("users/{userId}/cars")
-    public ResponseEntity<CarDto> addCar(@PathVariable Long userId, @RequestBody CarDto carDto) {
+    public ResponseEntity<CarDto> addCar(@PathVariable Long userId, @RequestBody @Validated CarDto carDto) {
 
         return new ResponseEntity<>(carService.save(userId, carDto), HttpStatus.CREATED);
     }
 
     @PatchMapping("users/{userId}/cars/{carId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateCar(@PathVariable Long userId, @PathVariable Long carId, @RequestBody CarDto carDto) {
+    public void updateCar(@PathVariable Long userId, @PathVariable Long carId, @RequestBody @Validated CarDto carDto) {
 
         carService.update(userId, carId, carDto);
     }
