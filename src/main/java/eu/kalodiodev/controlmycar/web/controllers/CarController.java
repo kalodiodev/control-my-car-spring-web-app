@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @RestController
 @RequestMapping(value = "/api/v1/", produces = "application/json")
 public class CarController {
@@ -15,6 +17,11 @@ public class CarController {
 
     public CarController(CarService carService) {
         this.carService = carService;
+    }
+
+    @GetMapping("users/{userId}/cars")
+    public Set<CarDto> allOfUser(@PathVariable Long userId) {
+        return carService.allOfUser(userId);
     }
 
     @GetMapping("users/{userId}/cars/{carId}")

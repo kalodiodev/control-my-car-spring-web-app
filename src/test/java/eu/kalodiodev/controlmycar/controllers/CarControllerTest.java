@@ -16,6 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -33,6 +37,21 @@ public class CarControllerTest {
 
     @Autowired
     MockMvc mockMvc;
+
+    @Test
+    void all_user_cars() throws Exception {
+        Set<CarDto> cars = new HashSet<>();
+        cars.add(CarDto.builder().id(1L).build());
+        cars.add(CarDto.builder().id(2L).build());
+
+        given(carService.allOfUser(anyLong())).willReturn(cars);
+
+        mockMvc.perform(get("/api/v1/users/1/cars"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[1].id", is(2)));
+    }
 
     @Test
     void find_car() throws Exception {
