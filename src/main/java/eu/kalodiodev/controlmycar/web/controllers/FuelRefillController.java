@@ -25,7 +25,7 @@ public class FuelRefillController {
     }
 
     @PostMapping("fuelrefills")
-    public ResponseEntity<FuelRefillDto> save_fuel_refill(@PathVariable Long userId,
+    public ResponseEntity<FuelRefillDto> addFuelRefill(@PathVariable Long userId,
                                                    @PathVariable Long carId,
                                                    @RequestBody FuelRefillDto fuelRefillDto) {
 
