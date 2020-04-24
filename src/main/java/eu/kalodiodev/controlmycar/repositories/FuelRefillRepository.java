@@ -4,4 +4,7 @@ import eu.kalodiodev.controlmycar.domains.FuelRefill;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FuelRefillRepository extends JpaRepository<FuelRefill, Long> {
+
+    void deleteByIdAndCarId(Long refillId, Long carId);
+
 }

@@ -1,7 +1,6 @@
 package eu.kalodiodev.controlmycar.web.controllers;
 
 import eu.kalodiodev.controlmycar.services.FuelRefillService;
-import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.web.model.FuelRefillDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

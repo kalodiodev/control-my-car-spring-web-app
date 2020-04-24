@@ -9,4 +9,6 @@ public interface FuelRefillService {
     List<FuelRefillDto> findAllByUserIdAndByCarId(Long userId, Long carId);
 
     FuelRefillDto save(Long userId, Long carId, FuelRefillDto fuelRefillDto);
+
+    void delete(Long userId, Long carId, Long refillId);
 }

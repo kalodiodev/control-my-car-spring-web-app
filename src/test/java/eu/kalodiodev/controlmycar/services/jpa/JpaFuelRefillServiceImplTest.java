@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class JpaFuelRefillServiceImplTest {
@@ -78,5 +79,26 @@ class JpaFuelRefillServiceImplTest {
         given(carRepository.findCarByIdAndUserId(anyLong(), anyLong())).willReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> fuelRefillService.save(1L,1L, fuelRefillDto));
+    }
+
+    @Test
+    void delete_fuel_refill() {
+        Car car = new Car();
+        car.setId(1L);
+
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.of(car));
+
+        fuelRefillService.delete(1L, 1L, 1L);
+
+        verify(fuelRefillRepository, times(1)).deleteByIdAndCarId(1L, 1L);
+    }
+
+    @Test
+    void delete_fuel_refill_that_does_not_exist_or_belong_to_car()  {
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.empty());
+
+        fuelRefillService.delete(1L, 1L, 1L);
+
+        verifyNoInteractions(fuelRefillRepository);
     }
 }

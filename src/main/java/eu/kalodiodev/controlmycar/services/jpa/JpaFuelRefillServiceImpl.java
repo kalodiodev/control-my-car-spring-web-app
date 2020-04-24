@@ -11,7 +11,9 @@ import eu.kalodiodev.controlmycar.services.FuelRefillService;
 import eu.kalodiodev.controlmycar.web.model.FuelRefillDto;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,5 +53,15 @@ public class JpaFuelRefillServiceImpl implements FuelRefillService {
         FuelRefill fuelRefill = fuelRefillRepository.save(fuelRefillDtoToFuelRefill.convert(fuelRefillDto));
 
         return fuelRefillToFuelRefillDto.convert(fuelRefill);
+    }
+
+    @Transactional
+    @Override
+    public void delete(Long userId, Long carId, Long refillId) {
+        Optional<Car> carOptional = carRepository.findCarByIdAndUserId(carId, userId);
+
+        if (carOptional.isPresent()) {
+            fuelRefillRepository.deleteByIdAndCarId(refillId, carId);
+        }
     }
 }
