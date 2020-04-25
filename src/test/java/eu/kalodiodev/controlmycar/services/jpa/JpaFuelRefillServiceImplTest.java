@@ -82,6 +82,42 @@ class JpaFuelRefillServiceImplTest {
     }
 
     @Test
+    void update_fuel_refill() {
+        FuelRefillDto fuelRefillDto = FuelRefillDto.builder()
+                .carId(1L)
+                .cost(10d)
+                .volume(5d)
+                .fullRefill(true)
+                .build();
+
+        Car car = new Car();
+        car.setId(1L);
+
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.of(car));
+        given(fuelRefillRepository.findByIdAndCarId(1L, 1L)).willReturn(Optional.of(new FuelRefill()));
+        given(fuelRefillDtoToFuelRefill.convert(any(FuelRefillDto.class))).willReturn(new FuelRefill());
+        given(fuelRefillRepository.save(any(FuelRefill.class))).willReturn(new FuelRefill());
+        given(fuelRefillToFuelRefillDto.convert(any(FuelRefill.class))).willReturn(fuelRefillDto);
+
+        FuelRefillDto updatedFuelRefillDto = fuelRefillService.update(1L, 1L, 1L, fuelRefillDto);
+
+        assertEquals(fuelRefillDto, updatedFuelRefillDto);
+        verify(fuelRefillRepository, times(1)).save(any(FuelRefill.class));
+    }
+
+    @Test
+    void update_refill_not_found() {
+        Car car = new Car();
+        car.setId(1L);
+
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.of(car));
+        given(fuelRefillRepository.findByIdAndCarId(anyLong(), anyLong())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> fuelRefillService.update(1L, 1L,1L, new FuelRefillDto()));
+    }
+
+
+    @Test
     void delete_fuel_refill() {
         Car car = new Car();
         car.setId(1L);

@@ -11,4 +11,6 @@ public interface FuelRefillService {
     FuelRefillDto save(Long userId, Long carId, FuelRefillDto fuelRefillDto);
 
     void delete(Long userId, Long carId, Long refillId);
+
+    FuelRefillDto update(Long userId, Long carId, Long fuelRefillId, FuelRefillDto fuelRefillDto);
 }

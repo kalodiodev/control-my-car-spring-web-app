@@ -55,6 +55,22 @@ public class JpaFuelRefillServiceImpl implements FuelRefillService {
         return fuelRefillToFuelRefillDto.convert(fuelRefill);
     }
 
+    @Override
+    public FuelRefillDto update(Long userId, Long carId, Long fuelRefillId, FuelRefillDto fuelRefillDto) {
+        Car car = carRepository.findCarByIdAndUserId(carId, userId)
+                .orElseThrow(NotFoundException::new);
+
+        FuelRefill fuelRefill = fuelRefillRepository.findByIdAndCarId(fuelRefillId, car.getId())
+                .orElseThrow(NotFoundException::new);
+
+        fuelRefillDto.setId(fuelRefill.getId());
+        fuelRefillDto.setCarId(car.getId());
+
+        FuelRefill updated = fuelRefillRepository.save(fuelRefillDtoToFuelRefill.convert(fuelRefillDto));
+
+        return fuelRefillToFuelRefillDto.convert(updated);
+    }
+
     @Transactional
     @Override
     public void delete(Long userId, Long carId, Long refillId) {
