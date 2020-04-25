@@ -31,6 +31,16 @@ public class FuelRefillController {
         return new ResponseEntity<>(fuelRefillService.save(userId, carId, fuelRefillDto), HttpStatus.CREATED);
     }
 
+    @PatchMapping("fuelrefills/{fuelRefillId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateFuelRefill(@PathVariable Long userId,
+                                 @PathVariable Long carId,
+                                 @PathVariable Long fuelRefillId,
+                                 @RequestBody FuelRefillDto fuelRefillDto) {
+
+        fuelRefillService.update(userId, carId, fuelRefillId, fuelRefillDto);
+    }
+
     @DeleteMapping("fuelrefills/{fuelRefillId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFuelRefill(@PathVariable Long userId,

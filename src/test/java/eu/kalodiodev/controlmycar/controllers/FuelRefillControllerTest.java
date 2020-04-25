@@ -1,6 +1,8 @@
 package eu.kalodiodev.controlmycar.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.kalodiodev.controlmycar.domains.FuelRefill;
+import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.services.FuelRefillService;
 import eu.kalodiodev.controlmycar.web.controllers.FuelRefillController;
 import eu.kalodiodev.controlmycar.web.model.FuelRefillDto;
@@ -16,8 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -65,6 +66,31 @@ class FuelRefillControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.cost", is(20.0)))
                 .andExpect(jsonPath("$.volume", is(15.0)));
+    }
+
+    @Test
+    void update_fuel_refill() throws Exception {
+        FuelRefillDto fuelRefillDto = getValidFuelRefillDto();
+
+        given(fuelRefillService.update(1L, 1L, 1L, fuelRefillDto)).willReturn(fuelRefillDto);
+
+        mockMvc.perform(patch("/api/v1/users/1/cars/1/fuelrefills/1")
+                .content(om.writeValueAsString(fuelRefillDto))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void update_fuel_refill_not_found() throws Exception {
+        FuelRefillDto fuelRefillDto = getValidFuelRefillDto();
+
+        given(fuelRefillService.update(1L, 1L, 1L, fuelRefillDto))
+                .willThrow(NotFoundException.class);
+
+        mockMvc.perform(patch("/api/v1/users/1/cars/1/fuelrefills/1")
+                .content(om.writeValueAsString(fuelRefillDto))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
