@@ -30,4 +30,13 @@ public class FuelRefillController {
 
         return new ResponseEntity<>(fuelRefillService.save(userId, carId, fuelRefillDto), HttpStatus.CREATED);
     }
+
+    @DeleteMapping("fuelrefills/{fuelRefillId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFuelRefill(@PathVariable Long userId,
+                                 @PathVariable Long carId,
+                                 @PathVariable Long fuelRefillId) {
+
+        fuelRefillService.delete(userId, carId, fuelRefillId);
+    }
 }

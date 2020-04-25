@@ -20,8 +20,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,6 +65,14 @@ class FuelRefillControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.cost", is(20.0)))
                 .andExpect(jsonPath("$.volume", is(15.0)));
+    }
+
+    @Test
+    void delete_fuel_refill() throws Exception {
+        mockMvc.perform(delete("/api/v1/users/1/cars/1/fuelrefills/1"))
+                .andExpect(status().isNoContent());
+
+        verify(fuelRefillService, times(1)).delete(1L, 1L, 1L);
     }
 
     private FuelRefillDto getValidFuelRefillDto() {
