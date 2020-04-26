@@ -4,7 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Data
@@ -13,14 +18,32 @@ import java.time.LocalDate;
 @Builder
 public class FuelRefillDto {
 
+    @Null
     private Long id;
-    private LocalDate date;
-    private Double odometer;
-    private Double volume;
-    private Double cost;
-    private Boolean fullRefill;
-    private String details;
-    private String gasStation;
-    private Long carId;
 
+    @NotNull
+    @PastOrPresent
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate date;
+
+    @NotNull
+    private Double odometer;
+
+    @NotNull
+    private Double volume;
+
+    @NotNull
+    private Double cost;
+
+    @NotNull
+    private Boolean fullRefill;
+
+    @Size(max = 250)
+    private String details;
+
+    @Size(max = 250)
+    private String gasStation;
+
+    @Null
+    private Long carId;
 }

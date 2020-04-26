@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,7 @@ public class FuelRefillController {
     @PostMapping("fuelrefills")
     public ResponseEntity<FuelRefillDto> addFuelRefill(@PathVariable Long userId,
                                                    @PathVariable Long carId,
-                                                   @RequestBody FuelRefillDto fuelRefillDto) {
+                                                   @RequestBody @Valid FuelRefillDto fuelRefillDto) {
 
         return new ResponseEntity<>(fuelRefillService.save(userId, carId, fuelRefillDto), HttpStatus.CREATED);
     }
@@ -36,7 +37,7 @@ public class FuelRefillController {
     public void updateFuelRefill(@PathVariable Long userId,
                                  @PathVariable Long carId,
                                  @PathVariable Long fuelRefillId,
-                                 @RequestBody FuelRefillDto fuelRefillDto) {
+                                 @RequestBody @Valid FuelRefillDto fuelRefillDto) {
 
         fuelRefillService.update(userId, carId, fuelRefillId, fuelRefillDto);
     }
