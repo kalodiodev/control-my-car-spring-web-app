@@ -48,9 +48,9 @@ public class CarControllerTest {
 
         mockMvc.perform(get("/api/v1/users/1/cars"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[1].id", is(2)));
+                .andExpect(jsonPath("$._embedded.carDtoList", hasSize(2)))
+                .andExpect(jsonPath("$._embedded.carDtoList[0].id", is(1)))
+                .andExpect(jsonPath("$._embedded.carDtoList[1].id", is(2)));
     }
 
     @Test

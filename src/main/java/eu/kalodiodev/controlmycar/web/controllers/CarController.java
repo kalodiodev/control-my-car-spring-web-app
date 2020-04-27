@@ -6,9 +6,9 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,7 +56,7 @@ public class CarController {
     }
 
     @PostMapping("users/{userId}/cars")
-    public ResponseEntity<CarDto> addCar(@PathVariable Long userId, @RequestBody @Validated CarDto carDto) {
+    public ResponseEntity<CarDto> addCar(@PathVariable Long userId, @RequestBody @Valid CarDto carDto) {
         CarDto saved = carService.save(userId, carDto);
 
         Link selfLink = linkTo(methodOn(CarController.class).findCar(userId, saved.getId())).withSelfRel();
@@ -70,7 +70,7 @@ public class CarController {
 
     @PatchMapping("users/{userId}/cars/{carId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateCar(@PathVariable Long userId, @PathVariable Long carId, @RequestBody @Validated CarDto carDto) {
+    public void updateCar(@PathVariable Long userId, @PathVariable Long carId, @RequestBody @Valid CarDto carDto) {
 
         carService.update(userId, carId, carDto);
     }
