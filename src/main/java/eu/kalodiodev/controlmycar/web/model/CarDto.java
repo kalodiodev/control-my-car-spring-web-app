@@ -1,6 +1,7 @@
 package eu.kalodiodev.controlmycar.web.model;
 
 import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.constraints.*;
 
@@ -8,7 +9,7 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CarDto {
+public class CarDto extends RepresentationModel<CarDto> {
 
     @Null
     private Long id;
