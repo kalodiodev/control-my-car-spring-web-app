@@ -7,6 +7,7 @@ import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.services.CarService;
 import net.bytebuddy.utility.RandomString;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -51,11 +53,42 @@ public class CarControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    CarDto carDto1;
+    CarDto carDto2;
+
+    @BeforeEach
+    void setUp() {
+        carDto1 = CarDto.builder()
+                .id(1L)
+                .userId(1L)
+                .manufacturer("Nissan")
+                .model("Micra")
+                .boughtPrice(10000d)
+                .initialOdometer(1000d)
+                .manufacturedYear(2009)
+                .ownedYear(2010)
+                .numberPlate("AAA-1234")
+                .build();
+
+        carDto2 = CarDto.builder()
+                .id(2L)
+                .userId(1L)
+                .manufacturer("Toyota")
+                .model("Yaris")
+                .boughtPrice(5230d)
+                .initialOdometer(120500d)
+                .manufacturedYear(2012)
+                .ownedYear(2012)
+                .numberPlate("BBB-1234")
+                .build();
+    }
+
+
     @Test
     void all_user_cars() throws Exception {
         Set<CarDto> cars = new HashSet<>();
-        cars.add(CarDto.builder().id(1L).build());
-        cars.add(CarDto.builder().id(2L).build());
+        cars.add(carDto1);
+        cars.add(carDto2);
 
         given(carService.allOfUser(anyLong())).willReturn(cars);
 
@@ -63,7 +96,11 @@ public class CarControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.cars", hasSize(2)))
                 .andExpect(jsonPath("$._embedded.cars[0].id", is(1)))
-                .andExpect(jsonPath("$._embedded.cars[1].id", is(2)));
+                .andExpect(jsonPath("$._embedded.cars[1].id", is(2)))
+                .andDo(document("v1/cars",
+                        preprocessResponse(prettyPrint()),
+                        responseFields(carsListFieldsDescriptor())
+                ));
     }
 
     @Test
@@ -90,37 +127,7 @@ public class CarControllerTest {
                             parameterWithName("userId").description("User id that owns the car"),
                             parameterWithName("carId").description("Car id of the desired car to get.")
                         ),
-                        responseFields(
-                                fieldWithPath("id")
-                                        .type(JsonFieldType.NUMBER)
-                                        .description("Car Id"),
-                                fieldWithPath("numberPlate")
-                                        .type(JsonFieldType.STRING)
-                                        .description("Car license number plate"),
-                                fieldWithPath("manufacturer")
-                                        .type(JsonFieldType.STRING)
-                                        .description("Car manufacturer"),
-                                fieldWithPath("model")
-                                        .type(JsonFieldType.STRING)
-                                        .description("Car model"),
-                                fieldWithPath("manufacturedYear")
-                                        .type(JsonFieldType.STRING)
-                                        .description("Car's year of manufacture"),
-                                fieldWithPath("ownedYear")
-                                        .type(JsonFieldType.STRING)
-                                        .description("Year when user bought the car"),
-                                fieldWithPath("boughtPrice")
-                                        .type(JsonFieldType.NUMBER)
-                                        .description("The price the user bought the car"),
-                                fieldWithPath("initialOdometer")
-                                        .type(JsonFieldType.NUMBER)
-                                        .description("Odometer value when user bought the car"),
-                                fieldWithPath("userId")
-                                        .type(JsonFieldType.NUMBER)
-                                        .description("User id that owns the car"),
-                                subsectionWithPath("_links")
-                                        .ignored()
-                        )
+                        responseFields(carFieldsDescriptor())
                 ));
     }
 
@@ -211,5 +218,78 @@ public class CarControllerTest {
                 .ownedYear(2010)
                 .numberPlate("AAA-1234")
                 .build();
+    }
+
+    FieldDescriptor[] carsListFieldsDescriptor() {
+        return new FieldDescriptor[] {
+                fieldWithPath("_embedded.cars")
+                        .type(JsonFieldType.ARRAY)
+                        .description("Cars list"),
+                fieldWithPath("_embedded.cars[].id")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Car Id"),
+                fieldWithPath("_embedded.cars[].numberPlate")
+                        .type(JsonFieldType.STRING)
+                        .description("Car license number plate"),
+                fieldWithPath("_embedded.cars[].manufacturer")
+                        .type(JsonFieldType.STRING)
+                        .description("Car manufacturer"),
+                fieldWithPath("_embedded.cars[].model")
+                        .type(JsonFieldType.STRING)
+                        .description("Car model"),
+                fieldWithPath("_embedded.cars[].manufacturedYear")
+                        .type(JsonFieldType.STRING)
+                        .description("Car's year of manufacture"),
+                fieldWithPath("_embedded.cars[].ownedYear")
+                        .type(JsonFieldType.STRING)
+                        .description("Year when user bought the car"),
+                fieldWithPath("_embedded.cars[].boughtPrice")
+                        .type(JsonFieldType.NUMBER)
+                        .description("The price the user bought the car"),
+                fieldWithPath("_embedded.cars[].initialOdometer")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Odometer value when user bought the car"),
+                fieldWithPath("_embedded.cars[].userId")
+                        .type(JsonFieldType.NUMBER)
+                        .description("User id that owns the car"),
+                subsectionWithPath("_embedded.cars[]._links")
+                        .description("Links related to this car"),
+                subsectionWithPath("_links")
+                        .ignored()
+        };
+    }
+
+    FieldDescriptor[] carFieldsDescriptor () {
+        return new FieldDescriptor[] {
+                fieldWithPath("id")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Car Id"),
+                fieldWithPath("numberPlate")
+                        .type(JsonFieldType.STRING)
+                        .description("Car license number plate"),
+                fieldWithPath("manufacturer")
+                        .type(JsonFieldType.STRING)
+                        .description("Car manufacturer"),
+                fieldWithPath("model")
+                        .type(JsonFieldType.STRING)
+                        .description("Car model"),
+                fieldWithPath("manufacturedYear")
+                        .type(JsonFieldType.STRING)
+                        .description("Car's year of manufacture"),
+                fieldWithPath("ownedYear")
+                        .type(JsonFieldType.STRING)
+                        .description("Year when user bought the car"),
+                fieldWithPath("boughtPrice")
+                        .type(JsonFieldType.NUMBER)
+                        .description("The price the user bought the car"),
+                fieldWithPath("initialOdometer")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Odometer value when user bought the car"),
+                fieldWithPath("userId")
+                        .type(JsonFieldType.NUMBER)
+                        .description("User id that owns the car"),
+                subsectionWithPath("_links")
+                        .ignored()
+        };
     }
 }

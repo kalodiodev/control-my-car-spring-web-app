@@ -14,6 +14,26 @@ Control My Car is Web Service Rest API that helps users manage the expenses of t
 
 This is the documentation of the resource Cars API.
 
+=== List Cars
+
+.Request cars list using cURL:
+
+include::{snippets}/v1/cars/curl-request.adoc[]
+
+.Cars list HTTP request:
+
+include::{snippets}/v1/cars/http-request.adoc[]
+
+.Cars list HTTP response:
+
+include::{snippets}/v1/cars/http-response.adoc[]
+
+.Response Body:
+include::{snippets}/v1/cars/response-body.adoc[]
+
+.Response Fields:
+include::{snippets}/v1/cars/response-fields.adoc[]
+
 === Read Car
 
 .Request a car using cURL:
