@@ -1,0 +1,37 @@
+= Control My Car Service Docs
+Athanasios Raptodimos;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+
+== Introduction
+
+Control My Car is Web Service Rest API that helps users manage the expenses of their cars.
+
+== Car
+
+This is the documentation of the resource Cars API.
+
+=== Read Car
+
+.Request a car using cURL:
+
+include::{snippets}/v1/car/curl-request.adoc[]
+
+.Car HTTP request:
+
+include::{snippets}/v1/car/http-request.adoc[]
+
+.Car HTTP response:
+
+include::{snippets}/v1/car/http-response.adoc[]
+
+.Response Body:
+include::{snippets}/v1/car/response-body.adoc[]
+
+.Response Fields:
+include::{snippets}/v1/car/response-fields.adoc[]
+
+=== Create Car

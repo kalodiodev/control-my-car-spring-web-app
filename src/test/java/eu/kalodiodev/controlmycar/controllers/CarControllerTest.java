@@ -8,11 +8,15 @@ import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.services.CarService;
 import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -23,9 +27,18 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@ExtendWith(RestDocumentationExtension.class)
+@AutoConfigureRestDocs(uriScheme = "https", uriHost = "control-my-car.kalodiodev.eu")
 @WebMvcTest(CarController.class)
 public class CarControllerTest {
 
@@ -58,14 +71,57 @@ public class CarControllerTest {
         Car car = new Car();
         car.setId(1L);
 
-        CarDto carDto = new CarDto();
+        CarDto carDto = getValidCarDto();
         carDto.setId(1L);
+        carDto.setUserId(1L);
 
         given(carService.findByUserIdAndCarId(1L, 1L)).willReturn(carDto);
 
-        mockMvc.perform(get("/api/v1/users/1/cars/1"))
+        mockMvc.perform(get("/api/v1/users/{userId}/cars/{carId}", 1L, 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(jsonPath("$.id", is(1)))
+                .andDo(document("v1/car",
+                        preprocessResponse(prettyPrint()),
+                        links(
+                            halLinks(),
+                            linkWithRel("self").ignored()
+                        ),
+                        pathParameters(
+                            parameterWithName("userId").description("User id that owns the car"),
+                            parameterWithName("carId").description("Car id of the desired car to get.")
+                        ),
+                        responseFields(
+                                fieldWithPath("id")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("Car Id"),
+                                fieldWithPath("numberPlate")
+                                        .type(JsonFieldType.STRING)
+                                        .description("Car license number plate"),
+                                fieldWithPath("manufacturer")
+                                        .type(JsonFieldType.STRING)
+                                        .description("Car manufacturer"),
+                                fieldWithPath("model")
+                                        .type(JsonFieldType.STRING)
+                                        .description("Car model"),
+                                fieldWithPath("manufacturedYear")
+                                        .type(JsonFieldType.STRING)
+                                        .description("Car's year of manufacture"),
+                                fieldWithPath("ownedYear")
+                                        .type(JsonFieldType.STRING)
+                                        .description("Year when user bought the car"),
+                                fieldWithPath("boughtPrice")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("The price the user bought the car"),
+                                fieldWithPath("initialOdometer")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("Odometer value when user bought the car"),
+                                fieldWithPath("userId")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("User id that owns the car"),
+                                subsectionWithPath("_links")
+                                        .ignored()
+                        )
+                ));
     }
 
     @Test
