@@ -55,3 +55,25 @@ include::{snippets}/v1/car/response-body.adoc[]
 include::{snippets}/v1/car/response-fields.adoc[]
 
 === Create Car
+
+.Post a car using cURL:
+
+include::{snippets}/v1/car-create/curl-request.adoc[]
+
+.Car HTTP POST request:
+
+include::{snippets}/v1/car-create/http-request.adoc[]
+
+.Car request fields:
+
+include::{snippets}/v1/car-create/request-fields.adoc[]
+
+.Car HTTP response:
+
+include::{snippets}/v1/car-create/http-response.adoc[]
+
+.Response Body:
+include::{snippets}/v1/car-create/response-body.adoc[]
+
+.Response Fields:
+include::{snippets}/v1/car-create/response-fields.adoc[]
