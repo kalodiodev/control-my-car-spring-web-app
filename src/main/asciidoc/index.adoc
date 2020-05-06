@@ -34,6 +34,8 @@ include::{snippets}/v1/cars/response-body.adoc[]
 .Response Fields:
 include::{snippets}/v1/cars/response-fields.adoc[]
 
+
+
 === Read Car
 
 .Request a car using cURL:
@@ -43,6 +45,10 @@ include::{snippets}/v1/car/curl-request.adoc[]
 .Car HTTP request:
 
 include::{snippets}/v1/car/http-request.adoc[]
+
+.Read Car path parameters:
+
+include::{snippets}/v1/car/path-parameters.adoc[]
 
 .Car HTTP response:
 
@@ -54,6 +60,8 @@ include::{snippets}/v1/car/response-body.adoc[]
 .Response Fields:
 include::{snippets}/v1/car/response-fields.adoc[]
 
+
+
 === Create Car
 
 .Post a car using cURL:
@@ -63,6 +71,10 @@ include::{snippets}/v1/car-create/curl-request.adoc[]
 .Car HTTP POST request:
 
 include::{snippets}/v1/car-create/http-request.adoc[]
+
+.Car create path parameters:
+
+include::{snippets}/v1/car-create/path-parameters.adoc[]
 
 .Car request fields:
 
@@ -77,3 +89,23 @@ include::{snippets}/v1/car-create/response-body.adoc[]
 
 .Response Fields:
 include::{snippets}/v1/car-create/response-fields.adoc[]
+
+
+
+=== Delete Car
+
+.Delete car using cURL:
+
+include::{snippets}/v1/car-delete/curl-request.adoc[]
+
+.Car HTTP DELETE request:
+
+include::{snippets}/v1/car-delete/http-request.adoc[]
+
+.Car delete path parameters:
+
+include::{snippets}/v1/car-delete/path-parameters.adoc[]
+
+.Car HTTP response:
+
+include::{snippets}/v1/car-delete/http-response.adoc[]

@@ -231,8 +231,14 @@ public class CarControllerTest {
 
     @Test
     void delete_car() throws Exception {
-        mockMvc.perform(delete("/api/v1/users/1/cars/3"))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/v1/users/{userId}/cars/{carId}", 1L, 3L))
+                .andExpect(status().isNoContent())
+                .andDo(document("v1/car-delete",
+                        pathParameters(
+                                parameterWithName("userId").description("User id that owns the car"),
+                                parameterWithName("carId").description("Id of the car to be deleted")
+                        )
+                ));
 
         verify(carService, times(1)).deleteByUserIdAndCarId(1L, 3L);
     }
