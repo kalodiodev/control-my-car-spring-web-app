@@ -148,8 +148,6 @@ public class CarControllerTest {
 
         given(carService.save(1L, carDto)).willReturn(carDto1);
 
-        ConstraintDescriptions carConstraints = new ConstraintDescriptions(CarDto.class);
-
         mockMvc.perform(post("/api/v1/users/{userId}/cars", 1L)
                 .content(om.writeValueAsString(carDto))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
@@ -168,38 +166,7 @@ public class CarControllerTest {
                         ),
                         requestFields(
                                 attributes(key("title").value("Fields for car creation")),
-
-                                fieldWithPath("id").ignored(),
-                                fieldWithPath("userId").ignored(),
-                                fieldWithPath("links").ignored(),
-                                fieldWithPath("numberPlate")
-                                        .type(JsonFieldType.STRING)
-                                        .description("Car's license number plate")
-                                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("numberPlate"))),
-                                fieldWithPath("manufacturer")
-                                        .type(JsonFieldType.STRING)
-                                        .description("Car manufacturer")
-                                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("manufacturer"))),
-                                fieldWithPath("model")
-                                        .type(JsonFieldType.STRING)
-                                        .description("Car model")
-                                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("model"))),
-                                fieldWithPath("manufacturedYear")
-                                        .type(JsonFieldType.STRING)
-                                        .description("The year the car was manufactured")
-                                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("manufacturedYear"))),
-                                fieldWithPath("boughtPrice")
-                                        .type(JsonFieldType.NUMBER)
-                                        .description("The price the user bought the car")
-                                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("boughtPrice"))),
-                                fieldWithPath("initialOdometer")
-                                        .type(JsonFieldType.NUMBER)
-                                        .description("The odometer reading when the user bought the car")
-                                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("initialOdometer"))),
-                                fieldWithPath("ownedYear")
-                                        .type(JsonFieldType.STRING)
-                                        .description("The year the user bought the car")
-                                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("ownedYear")))
+                                carRequestFieldsDescriptor()
                         ),
                         responseFields(
                                 carFieldsDescriptor()
@@ -211,10 +178,22 @@ public class CarControllerTest {
     void update_car() throws Exception {
         CarDto carDto = getValidCarDto();
 
-        mockMvc.perform(patch("/api/v1/users/1/cars/3")
+        mockMvc.perform(patch("/api/v1/users/{userId}/cars/{carId}", 1L, 3L)
                 .content(om.writeValueAsString(carDto))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("v1/car-update",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("userId").description("User id that owns the car"),
+                                parameterWithName("carId").description("Id of the car to update")
+                        ),
+                        requestFields(
+                                attributes(key("title").value("Fields for car creation")),
+                                carRequestFieldsDescriptor()
+                        )
+                ));
     }
 
     @Test
@@ -350,6 +329,44 @@ public class CarControllerTest {
                         .description("User id that owns the car"),
                 subsectionWithPath("_links")
                         .ignored()
+        };
+    }
+
+    FieldDescriptor[] carRequestFieldsDescriptor() {
+        ConstraintDescriptions carConstraints = new ConstraintDescriptions(CarDto.class);
+
+        return new FieldDescriptor[] {
+                fieldWithPath("id").ignored(),
+                fieldWithPath("userId").ignored(),
+                fieldWithPath("links").ignored(),
+                fieldWithPath("numberPlate")
+                        .type(JsonFieldType.STRING)
+                        .description("Car's license number plate")
+                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("numberPlate"))),
+                fieldWithPath("manufacturer")
+                        .type(JsonFieldType.STRING)
+                        .description("Car manufacturer")
+                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("manufacturer"))),
+                fieldWithPath("model")
+                        .type(JsonFieldType.STRING)
+                        .description("Car model")
+                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("model"))),
+                fieldWithPath("manufacturedYear")
+                        .type(JsonFieldType.STRING)
+                        .description("The year the car was manufactured")
+                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("manufacturedYear"))),
+                fieldWithPath("boughtPrice")
+                        .type(JsonFieldType.NUMBER)
+                        .description("The price the user bought the car")
+                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("boughtPrice"))),
+                fieldWithPath("initialOdometer")
+                        .type(JsonFieldType.NUMBER)
+                        .description("The odometer reading when the user bought the car")
+                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("initialOdometer"))),
+                fieldWithPath("ownedYear")
+                        .type(JsonFieldType.STRING)
+                        .description("The year the user bought the car")
+                        .attributes(key("constraints").value(carConstraints.descriptionsForProperty("ownedYear")))
         };
     }
 }

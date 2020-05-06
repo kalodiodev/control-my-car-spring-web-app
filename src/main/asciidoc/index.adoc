@@ -91,6 +91,29 @@ include::{snippets}/v1/car-create/response-body.adoc[]
 include::{snippets}/v1/car-create/response-fields.adoc[]
 
 
+=== Update Car
+
+.Patch a car using cURL:
+
+include::{snippets}/v1/car-update/curl-request.adoc[]
+
+.Car HTTP PATCH request:
+
+include::{snippets}/v1/car-update/http-request.adoc[]
+
+.Car update path parameters:
+
+include::{snippets}/v1/car-update/path-parameters.adoc[]
+
+.Car request fields:
+
+include::{snippets}/v1/car-update/request-fields.adoc[]
+
+.Car HTTP response:
+
+include::{snippets}/v1/car-update/http-response.adoc[]
+
+
 
 === Delete Car
 
