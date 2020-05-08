@@ -148,8 +148,15 @@ public class CarControllerTest {
 
         given(carService.save(1L, carDto)).willReturn(carDto1);
 
+        String jsonContent = om.writeValueAsString(carDto)
+                .replace("\"id\":null,", "")
+                .replace("\"userId\":null,", "")
+                .replace(",\"links\":[]", "");
+
+        System.out.println(jsonContent);
+
         mockMvc.perform(post("/api/v1/users/{userId}/cars", 1L)
-                .content(om.writeValueAsString(carDto))
+                .content(jsonContent)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.model", is("Micra")))
@@ -178,8 +185,13 @@ public class CarControllerTest {
     void update_car() throws Exception {
         CarDto carDto = getValidCarDto();
 
+        String jsonContent = om.writeValueAsString(carDto)
+                .replace("\"id\":null,", "")
+                .replace("\"userId\":null,", "")
+                .replace(",\"links\":[]", "");
+
         mockMvc.perform(patch("/api/v1/users/{userId}/cars/{carId}", 1L, 3L)
-                .content(om.writeValueAsString(carDto))
+                .content(jsonContent)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andDo(document("v1/car-update",
@@ -336,9 +348,9 @@ public class CarControllerTest {
         ConstraintDescriptions carConstraints = new ConstraintDescriptions(CarDto.class);
 
         return new FieldDescriptor[] {
-                fieldWithPath("id").ignored(),
-                fieldWithPath("userId").ignored(),
-                fieldWithPath("links").ignored(),
+//                fieldWithPath("id").ignored(),
+//                fieldWithPath("userId").ignored(),
+//                fieldWithPath("links").ignored(),
                 fieldWithPath("numberPlate")
                         .type(JsonFieldType.STRING)
                         .description("Car's license number plate")
