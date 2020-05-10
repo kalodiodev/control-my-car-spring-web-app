@@ -1,9 +1,10 @@
 package eu.kalodiodev.controlmycar.services.jpa;
 
-import eu.kalodiodev.controlmycar.web.model.UserDto;
-import eu.kalodiodev.controlmycar.converter.UserDtoToUser;
+import eu.kalodiodev.controlmycar.domains.Role;
+import eu.kalodiodev.controlmycar.services.RoleService;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.repositories.UserRepository;
+import eu.kalodiodev.controlmycar.web.model.authentication.RegistrationRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ class JpaUserServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
-    private UserDtoToUser userDtoToUser;
+    private RoleService roleService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -49,13 +50,16 @@ class JpaUserServiceImplTest {
     }
 
     @Test
-    void register_user_command() {
+    void register_user() {
+        RegistrationRequest registrationRequest = new RegistrationRequest();
+        registrationRequest.setPassword("password");
+
         user1.setPassword("password");
 
         given(userRepository.save(any(User.class))).willReturn(user1);
-        given(userDtoToUser.convert(any(UserDto.class))).willReturn(user1);
+        given(roleService.findByName(anyString())).willReturn(new Role());
         given(passwordEncoder.encode(anyString())).willReturn("asdffdsadf");
 
-        assertEquals(user1, userService.register(new UserDto()));
+        assertEquals(user1, userService.register(registrationRequest));
     }
 }

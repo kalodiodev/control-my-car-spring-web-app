@@ -1,10 +1,10 @@
 package eu.kalodiodev.controlmycar.services.jpa;
 
-import eu.kalodiodev.controlmycar.web.model.UserDto;
-import eu.kalodiodev.controlmycar.converter.UserDtoToUser;
+import eu.kalodiodev.controlmycar.services.RoleService;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.repositories.UserRepository;
 import eu.kalodiodev.controlmycar.services.UserService;
+import eu.kalodiodev.controlmycar.web.model.authentication.RegistrationRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,16 +12,16 @@ import org.springframework.stereotype.Service;
 public class JpaUserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserDtoToUser userDtoToUser;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
     public JpaUserServiceImpl(UserRepository userRepository,
-                              UserDtoToUser userDtoToUser,
-                              PasswordEncoder passwordEncoder) {
+                              PasswordEncoder passwordEncoder,
+                              RoleService roleService) {
 
         this.userRepository = userRepository;
-        this.userDtoToUser = userDtoToUser;
         this.passwordEncoder = passwordEncoder;
+        this.roleService = roleService;
     }
 
     @Override
@@ -30,15 +30,14 @@ public class JpaUserServiceImpl implements UserService {
     }
 
     @Override
-    public User register(UserDto userDto) {
-        User user = userDtoToUser.convert(userDto);
+    public User register(RegistrationRequest registrationRequest) {
+        User user = new User();
+        user.setFirstName(registrationRequest.getFirstName());
+        user.setLastName(registrationRequest.getLastName());
+        user.setEmail(registrationRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
 
-        if (user == null) {
-            return null;
-        }
-
-        String password = passwordEncoder.encode(user.getPassword());
-        user.setPassword(password);
+        user.addRole(roleService.findByName("USER"));
 
         return save(user);
     }

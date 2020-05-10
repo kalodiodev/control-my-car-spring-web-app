@@ -1,16 +1,20 @@
 package eu.kalodiodev.controlmycar.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.kalodiodev.controlmycar.SecurityTestConfig;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.services.FuelRefillService;
+import eu.kalodiodev.controlmycar.services.security.JwtUtil;
 import eu.kalodiodev.controlmycar.web.model.FuelRefillDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -27,8 +31,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(FuelRefillController.class)
-@WithMockUser(username = "test@example.com")
+@ActiveProfiles("test")
+@Import(SecurityTestConfig.class)
+@WithMockUser("testUser")
 class FuelRefillControllerTest {
+
+    @MockBean
+    JwtUtil jwtUtil;
 
     @MockBean
     FuelRefillService fuelRefillService;

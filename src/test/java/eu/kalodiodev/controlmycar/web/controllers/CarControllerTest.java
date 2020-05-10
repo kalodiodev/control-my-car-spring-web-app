@@ -1,8 +1,10 @@
 package eu.kalodiodev.controlmycar.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.kalodiodev.controlmycar.SecurityTestConfig;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
+import eu.kalodiodev.controlmycar.services.security.JwtUtil;
 import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.services.CarService;
@@ -14,12 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -31,6 +35,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 //import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
@@ -44,11 +50,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(RestDocumentationExtension.class)
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "control-my-car.kalodiodev.eu")
-@WebMvcTest(CarController.class)
+@WebMvcTest(value = CarController.class)
+@ActiveProfiles("test")
+@Import(SecurityTestConfig.class)
 public class CarControllerTest {
+
+    private static final String AUTHORIZATION_TOKEN = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNTg5MTQzODYxLCJpYXQiOjE1ODkxMjU4NjF9.M40eLliTLQK9G4YpIPYsNNoSERobwzLGmLQiY-w9_0fD2DLd0Sm4D1wPAMuLaMRrjlsAPqZ_jwoeGBuKUIKz0g";
 
     @MockBean
     CarService carService;
+
+    @MockBean
+    JwtUtil jwtUtil;
 
     @Autowired
     ObjectMapper om;
@@ -103,13 +116,17 @@ public class CarControllerTest {
 
         given(carService.allOfUser(anyLong())).willReturn(cars);
 
-        mockMvc.perform(get("/api/v1/cars").with(user(authenticatedUser)))
+        mockMvc.perform(get("/api/v1/cars").with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION,AUTHORIZATION_TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.cars", hasSize(2)))
                 .andExpect(jsonPath("$._embedded.cars[0].id", is(1)))
                 .andExpect(jsonPath("$._embedded.cars[1].id", is(2)))
                 .andDo(document("v1/cars",
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
                         responseFields(carsListFieldsDescriptor())
                 ));
     }
@@ -125,11 +142,15 @@ public class CarControllerTest {
 
         given(carService.findByUserIdAndCarId(1L, 1L)).willReturn(carDto);
 
-        mockMvc.perform(get("/api/v1/cars/{carId}", 1L).with(user(authenticatedUser)))
+        mockMvc.perform(get("/api/v1/cars/{carId}", 1L).with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION,AUTHORIZATION_TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andDo(document("v1/car",
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
                         links(
                             halLinks(),
                             linkWithRel("self").ignored()
@@ -163,14 +184,20 @@ public class CarControllerTest {
 
         System.out.println(jsonContent);
 
-        mockMvc.perform(post("/api/v1/cars", 1L).with(user(authenticatedUser))
+        mockMvc.perform(post("/api/v1/cars")
+                    .with(user(authenticatedUser)
+                )
                 .content(jsonContent)
+                .header(HttpHeaders.AUTHORIZATION,AUTHORIZATION_TOKEN)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.model", is("Micra")))
                 .andDo(document("v1/car-create",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
                         links(
                                 halLinks(),
                                 linkWithRel("self").ignored(),
@@ -197,11 +224,15 @@ public class CarControllerTest {
 
         mockMvc.perform(patch("/api/v1/cars/{carId}", 3L).with(user(authenticatedUser))
                 .content(jsonContent)
+                .header(HttpHeaders.AUTHORIZATION,AUTHORIZATION_TOKEN)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andDo(document("v1/car-update",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
                         pathParameters(
                                 parameterWithName("carId").description("Id of the car to update")
                         ),
@@ -226,9 +257,13 @@ public class CarControllerTest {
 
     @Test
     void delete_car() throws Exception {
-        mockMvc.perform(delete("/api/v1/cars/{carId}", 3L).with(user(authenticatedUser)))
+        mockMvc.perform(delete("/api/v1/cars/{carId}", 3L).with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION,AUTHORIZATION_TOKEN))
                 .andExpect(status().isNoContent())
                 .andDo(document("v1/car-delete",
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
                         pathParameters(
                                 parameterWithName("carId").description("Id of the car to be deleted")
                         )

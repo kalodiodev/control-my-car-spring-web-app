@@ -24,6 +24,10 @@ include::{snippets}/v1/cars/curl-request.adoc[]
 
 include::{snippets}/v1/cars/http-request.adoc[]
 
+.Cars List request headers:
+
+include::{snippets}/v1/cars/request-headers.adoc[]
+
 .Cars list HTTP response:
 
 include::{snippets}/v1/cars/http-response.adoc[]
@@ -45,6 +49,10 @@ include::{snippets}/v1/car/curl-request.adoc[]
 .Car HTTP request:
 
 include::{snippets}/v1/car/http-request.adoc[]
+
+.Read Car request headers:
+
+include::{snippets}/v1/car/request-headers.adoc[]
 
 .Read Car path parameters:
 
@@ -72,9 +80,9 @@ include::{snippets}/v1/car-create/curl-request.adoc[]
 
 include::{snippets}/v1/car-create/http-request.adoc[]
 
-.Car create path parameters:
+.Car create request headers:
 
-include::{snippets}/v1/car-create/path-parameters.adoc[]
+include::{snippets}/v1/car-create/request-headers.adoc[]
 
 .Car request fields:
 
@@ -101,6 +109,10 @@ include::{snippets}/v1/car-update/curl-request.adoc[]
 
 include::{snippets}/v1/car-update/http-request.adoc[]
 
+.Car update request headers:
+
+include::{snippets}/v1/car-update/request-headers.adoc[]
+
 .Car update path parameters:
 
 include::{snippets}/v1/car-update/path-parameters.adoc[]
@@ -124,6 +136,10 @@ include::{snippets}/v1/car-delete/curl-request.adoc[]
 .Car HTTP DELETE request:
 
 include::{snippets}/v1/car-delete/http-request.adoc[]
+
+.Car delete request headers:
+
+include::{snippets}/v1/car-delete/request-headers.adoc[]
 
 .Car delete path parameters:
 
