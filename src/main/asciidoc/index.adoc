@@ -10,6 +10,35 @@ Athanasios Raptodimos;
 
 Control My Car is Web Service Rest API that helps users manage the expenses of their cars.
 
+== Authentication
+
+User authentication.
+
+=== Register User
+
+.Register user using cURL:
+
+include::{snippets}/v1/user-register/curl-request.adoc[]
+
+.Register user HTTP request:
+
+include::{snippets}/v1/user-register/http-request.adoc[]
+
+.Register user request fields:
+
+include::{snippets}/v1/user-register/request-fields.adoc[]
+
+.Register user HTTP response:
+
+include::{snippets}/v1/user-register/http-response.adoc[]
+
+.Response Body:
+include::{snippets}/v1/user-register/response-body.adoc[]
+
+.Response Fields:
+include::{snippets}/v1/user-register/response-fields.adoc[]
+
+
 == Car
 
 This is the documentation of the resource Cars API.
