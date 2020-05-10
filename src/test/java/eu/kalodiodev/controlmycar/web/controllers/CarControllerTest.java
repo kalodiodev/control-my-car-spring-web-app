@@ -1,6 +1,7 @@
 package eu.kalodiodev.controlmycar.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.domains.Car;
@@ -19,7 +20,6 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -39,12 +39,12 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.snippet.Attributes.attributes;
 import static org.springframework.restdocs.snippet.Attributes.key;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(RestDocumentationExtension.class)
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "control-my-car.kalodiodev.eu")
 @WebMvcTest(CarController.class)
-@WithMockUser(username = "test@example.com")
 public class CarControllerTest {
 
     @MockBean
@@ -58,6 +58,8 @@ public class CarControllerTest {
 
     CarDto carDto1;
     CarDto carDto2;
+
+    User authenticatedUser;
 
     @BeforeEach
     void setUp() {
@@ -84,6 +86,12 @@ public class CarControllerTest {
                 .ownedYear(2012)
                 .numberPlate("BBB-1234")
                 .build();
+
+        authenticatedUser = new User();
+        authenticatedUser.setId(1L);
+        authenticatedUser.setEmail("test@example.com");
+        authenticatedUser.setFirstName("John");
+        authenticatedUser.setLastName("Doe");
     }
 
 
@@ -95,7 +103,7 @@ public class CarControllerTest {
 
         given(carService.allOfUser(anyLong())).willReturn(cars);
 
-        mockMvc.perform(get("/api/v1/users/1/cars"))
+        mockMvc.perform(get("/api/v1/cars").with(user(authenticatedUser)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.cars", hasSize(2)))
                 .andExpect(jsonPath("$._embedded.cars[0].id", is(1)))
@@ -117,7 +125,7 @@ public class CarControllerTest {
 
         given(carService.findByUserIdAndCarId(1L, 1L)).willReturn(carDto);
 
-        mockMvc.perform(get("/api/v1/users/{userId}/cars/{carId}", 1L, 1L))
+        mockMvc.perform(get("/api/v1/cars/{carId}", 1L).with(user(authenticatedUser)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andDo(document("v1/car",
@@ -127,7 +135,6 @@ public class CarControllerTest {
                             linkWithRel("self").ignored()
                         ),
                         pathParameters(
-                            parameterWithName("userId").description("User id that owns the car"),
                             parameterWithName("carId").description("Car id of the desired car to get.")
                         ),
                         responseFields(carFieldsDescriptor())
@@ -138,7 +145,7 @@ public class CarControllerTest {
     void find_car_not_found() throws Exception {
         given(carService.findByUserIdAndCarId(1L, 1L)).willThrow(NotFoundException.class);
 
-        mockMvc.perform(get("/api/v1/users/1/cars/1"))
+        mockMvc.perform(get("/api/v1/cars/1").with(user(authenticatedUser)))
                 .andExpect(status().isNotFound());
     }
 
@@ -156,7 +163,7 @@ public class CarControllerTest {
 
         System.out.println(jsonContent);
 
-        mockMvc.perform(post("/api/v1/users/{userId}/cars", 1L)
+        mockMvc.perform(post("/api/v1/cars", 1L).with(user(authenticatedUser))
                 .content(jsonContent)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -168,9 +175,6 @@ public class CarControllerTest {
                                 halLinks(),
                                 linkWithRel("self").ignored(),
                                 linkWithRel("all-cars").description("Link to all user cars")
-                        ),
-                        pathParameters(
-                                parameterWithName("userId").description("User id that owns the car")
                         ),
                         requestFields(
                                 attributes(key("title").value("Fields for car creation")),
@@ -191,7 +195,7 @@ public class CarControllerTest {
                 .replace("\"userId\":null,", "")
                 .replace(",\"links\":[]", "");
 
-        mockMvc.perform(patch("/api/v1/users/{userId}/cars/{carId}", 1L, 3L)
+        mockMvc.perform(patch("/api/v1/cars/{carId}", 3L).with(user(authenticatedUser))
                 .content(jsonContent)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
@@ -199,7 +203,6 @@ public class CarControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(
-                                parameterWithName("userId").description("User id that owns the car"),
                                 parameterWithName("carId").description("Id of the car to update")
                         ),
                         requestFields(
@@ -215,7 +218,7 @@ public class CarControllerTest {
 
         CarDto carDto = getValidCarDto();
 
-        mockMvc.perform(patch("/api/v1/users/1/cars/3")
+        mockMvc.perform(patch("/api/v1/cars/3").with(user(authenticatedUser))
                 .content(om.writeValueAsString(carDto))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -223,11 +226,10 @@ public class CarControllerTest {
 
     @Test
     void delete_car() throws Exception {
-        mockMvc.perform(delete("/api/v1/users/{userId}/cars/{carId}", 1L, 3L))
+        mockMvc.perform(delete("/api/v1/cars/{carId}", 3L).with(user(authenticatedUser)))
                 .andExpect(status().isNoContent())
                 .andDo(document("v1/car-delete",
                         pathParameters(
-                                parameterWithName("userId").description("User id that owns the car"),
                                 parameterWithName("carId").description("Id of the car to be deleted")
                         )
                 ));
@@ -254,7 +256,7 @@ public class CarControllerTest {
     }
 
     void post_a_new_car(CarDto carDto, ResultMatcher status) throws Exception {
-        mockMvc.perform(post("/api/v1/users/1/cars")
+        mockMvc.perform(post("/api/v1/cars").with(user(authenticatedUser))
                 .content(om.writeValueAsString(carDto))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status);

@@ -1,11 +1,13 @@
 package eu.kalodiodev.controlmycar.web.controllers;
 
+import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.services.CarService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -25,59 +27,59 @@ public class CarController {
         this.carService = carService;
     }
 
-    @GetMapping("users/{userId}/cars")
-    public CollectionModel<CarDto> allOfUser(@PathVariable Long userId) {
-        Set<CarDto> cars = carService.allOfUser(userId).stream().map(carDto -> {
-            Link selfLink = linkTo(methodOn(CarController.class).findCar(userId, carDto.getId())).withSelfRel();
+    @GetMapping("cars")
+    public CollectionModel<CarDto> allOfUser(@AuthenticationPrincipal User user) {
+        Set<CarDto> cars = carService.allOfUser(user.getId()).stream().map(carDto -> {
+            Link selfLink = linkTo(methodOn(CarController.class).findCar(user, carDto.getId())).withSelfRel();
             carDto.add(selfLink);
 
             return carDto;
         }).collect(Collectors.toSet());
 
-        Link link = linkTo(methodOn(CarController.class).allOfUser(userId)).withSelfRel();
+        Link link = linkTo(methodOn(CarController.class).allOfUser(user)).withSelfRel();
         CollectionModel<CarDto> result = new CollectionModel<>(cars, link);
 
         return result;
     }
 
-    @GetMapping("users/{userId}/cars/{carId}")
-    public CarDto findCar(@PathVariable Long userId, @PathVariable Long carId) {
-        CarDto carDto = carService.findByUserIdAndCarId(userId, carId);
+    @GetMapping("cars/{carId}")
+    public CarDto findCar(@AuthenticationPrincipal User user, @PathVariable Long carId) {
+        CarDto carDto = carService.findByUserIdAndCarId(user.getId(), carId);
 
-        Link selfLink = linkTo(methodOn(CarController.class).findCar(userId, carId)).withSelfRel();
+        Link selfLink = linkTo(methodOn(CarController.class).findCar(user, carId)).withSelfRel();
         carDto.add(selfLink);
 
-        if (carService.allOfUser(userId).size() > 0) {
-            Link carsLink = linkTo(methodOn(CarController.class).allOfUser(userId)).withRel("all-cars");
+        if (carService.allOfUser(user.getId()).size() > 0) {
+            Link carsLink = linkTo(methodOn(CarController.class).allOfUser(user)).withRel("all-cars");
             carDto.add(carsLink);
         }
 
         return carDto;
     }
 
-    @PostMapping("users/{userId}/cars")
-    public ResponseEntity<CarDto> addCar(@PathVariable Long userId, @RequestBody @Valid CarDto carDto) {
-        CarDto saved = carService.save(userId, carDto);
+    @PostMapping("cars")
+    public ResponseEntity<CarDto> addCar(@AuthenticationPrincipal User user, @RequestBody @Valid CarDto carDto) {
+        CarDto saved = carService.save(user.getId(), carDto);
 
-        Link selfLink = linkTo(methodOn(CarController.class).findCar(userId, saved.getId())).withSelfRel();
+        Link selfLink = linkTo(methodOn(CarController.class).findCar(user, saved.getId())).withSelfRel();
         saved.add(selfLink);
 
-        Link carsLink = linkTo(methodOn(CarController.class).allOfUser(userId)).withRel("all-cars");
+        Link carsLink = linkTo(methodOn(CarController.class).allOfUser(user)).withRel("all-cars");
         saved.add(carsLink);
 
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
-    @PatchMapping("users/{userId}/cars/{carId}")
+    @PatchMapping("cars/{carId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateCar(@PathVariable Long userId, @PathVariable Long carId, @RequestBody @Valid CarDto carDto) {
+    public void updateCar(@AuthenticationPrincipal User user, @PathVariable Long carId, @RequestBody @Valid CarDto carDto) {
 
-        carService.update(userId, carId, carDto);
+        carService.update(user.getId(), carId, carDto);
     }
 
-    @DeleteMapping("users/{userId}/cars/{carId}")
+    @DeleteMapping("cars/{carId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCar(@PathVariable Long userId, @PathVariable Long carId) {
-        carService.deleteByUserIdAndCarId(userId, carId);
+    public void deleteCar(@AuthenticationPrincipal User user, @PathVariable Long carId) {
+        carService.deleteByUserIdAndCarId(user.getId(), carId);
     }
 }
