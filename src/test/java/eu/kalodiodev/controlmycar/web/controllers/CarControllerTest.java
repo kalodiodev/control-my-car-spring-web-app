@@ -1,8 +1,7 @@
-package eu.kalodiodev.controlmycar.controllers;
+package eu.kalodiodev.controlmycar.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
-import eu.kalodiodev.controlmycar.web.controllers.CarController;
 import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.services.CarService;
@@ -20,6 +19,7 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -44,6 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(RestDocumentationExtension.class)
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "control-my-car.kalodiodev.eu")
 @WebMvcTest(CarController.class)
+@WithMockUser(username = "test@example.com")
 public class CarControllerTest {
 
     @MockBean

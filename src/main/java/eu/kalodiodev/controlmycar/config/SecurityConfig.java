@@ -15,7 +15,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String[] PUBLIC_MATCHERS = {
             "/webjars/**",
             "/login",
-            "/**"
+            "/h2-console/**"
     };
 
     @Bean
@@ -30,7 +30,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                     .antMatchers(PUBLIC_MATCHERS).permitAll()
-                    .antMatchers("/h2-console/**").permitAll()
                     .anyRequest().authenticated();
 
         // Only for development

@@ -1,6 +1,5 @@
-package eu.kalodiodev.controlmycar.controllers;
+package eu.kalodiodev.controlmycar.web.controllers;
 
-import eu.kalodiodev.controlmycar.web.controllers.HomeController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
