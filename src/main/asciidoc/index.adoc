@@ -38,6 +38,30 @@ include::{snippets}/v1/user-register/response-body.adoc[]
 .Response Fields:
 include::{snippets}/v1/user-register/response-fields.adoc[]
 
+=== Authenticate User
+
+.Authenticate user using cURL:
+
+include::{snippets}/v1/user-authenticate/curl-request.adoc[]
+
+.Authenticate user HTTP request:
+
+include::{snippets}/v1/user-authenticate/http-request.adoc[]
+
+.Authenticate user request fields:
+
+include::{snippets}/v1/user-authenticate/request-fields.adoc[]
+
+.Authenticate user HTTP response:
+
+include::{snippets}/v1/user-authenticate/http-response.adoc[]
+
+.Response Body:
+include::{snippets}/v1/user-authenticate/response-body.adoc[]
+
+.Response Fields:
+include::{snippets}/v1/user-authenticate/response-fields.adoc[]
+
 
 == Car
 

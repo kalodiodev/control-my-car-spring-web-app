@@ -55,7 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(SecurityTestConfig.class)
 public class CarControllerTest {
 
-    private static final String AUTHORIZATION_TOKEN = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNTg5MTQzODYxLCJpYXQiOjE1ODkxMjU4NjF9.M40eLliTLQK9G4YpIPYsNNoSERobwzLGmLQiY-w9_0fD2DLd0Sm4D1wPAMuLaMRrjlsAPqZ_jwoeGBuKUIKz0g";
+    private static final String AUTHORIZATION_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNTg5MTQzODYxLCJpYXQiOjE1ODkxMjU4NjF9.M40eLliTLQK9G4YpIPYsNNoSERobwzLGmLQiY-w9_0fD2DLd0Sm4D1wPAMuLaMRrjlsAPqZ_jwoeGBuKUIKz0g";
 
     @MockBean
     CarService carService;
@@ -117,7 +117,7 @@ public class CarControllerTest {
         given(carService.allOfUser(anyLong())).willReturn(cars);
 
         mockMvc.perform(get("/api/v1/cars").with(user(authenticatedUser))
-                .header(HttpHeaders.AUTHORIZATION,AUTHORIZATION_TOKEN))
+                .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.cars", hasSize(2)))
                 .andExpect(jsonPath("$._embedded.cars[0].id", is(1)))
@@ -143,7 +143,7 @@ public class CarControllerTest {
         given(carService.findByUserIdAndCarId(1L, 1L)).willReturn(carDto);
 
         mockMvc.perform(get("/api/v1/cars/{carId}", 1L).with(user(authenticatedUser))
-                .header(HttpHeaders.AUTHORIZATION,AUTHORIZATION_TOKEN))
+                .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andDo(document("v1/car",
@@ -188,7 +188,7 @@ public class CarControllerTest {
                     .with(user(authenticatedUser)
                 )
                 .content(jsonContent)
-                .header(HttpHeaders.AUTHORIZATION,AUTHORIZATION_TOKEN)
+                .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.model", is("Micra")))
@@ -224,7 +224,7 @@ public class CarControllerTest {
 
         mockMvc.perform(patch("/api/v1/cars/{carId}", 3L).with(user(authenticatedUser))
                 .content(jsonContent)
-                .header(HttpHeaders.AUTHORIZATION,AUTHORIZATION_TOKEN)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AUTHORIZATION_TOKEN)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andDo(document("v1/car-update",
@@ -258,7 +258,7 @@ public class CarControllerTest {
     @Test
     void delete_car() throws Exception {
         mockMvc.perform(delete("/api/v1/cars/{carId}", 3L).with(user(authenticatedUser))
-                .header(HttpHeaders.AUTHORIZATION,AUTHORIZATION_TOKEN))
+                .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN))
                 .andExpect(status().isNoContent())
                 .andDo(document("v1/car-delete",
                         requestHeaders(

@@ -5,6 +5,7 @@ import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.services.UserService;
 import eu.kalodiodev.controlmycar.services.security.JwtUtil;
 
+import eu.kalodiodev.controlmycar.web.model.authentication.AuthenticationRequest;
 import eu.kalodiodev.controlmycar.web.model.authentication.RegistrationRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 //import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -40,6 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = AuthController.class)
 @ActiveProfiles("test")
 public class AuthControllerTest {
+
+    private static final String AUTHORIZATION_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNTg5MTQzODYxLCJpYXQiOjE1ODkxMjU4NjF9.M40eLliTLQK9G4YpIPYsNNoSERobwzLGmLQiY-w9_0fD2DLd0Sm4D1wPAMuLaMRrjlsAPqZ_jwoeGBuKUIKz0g";
 
     @Autowired
     MockMvc mockMvc;
@@ -73,12 +77,12 @@ public class AuthControllerTest {
         String jsonContent = om.writeValueAsString(registrationRequest);
 
         given(userService.register(any(RegistrationRequest.class))).willReturn(new User());
-        given(jwtUtil.generateToken(any(User.class))).willReturn("token");
+        given(jwtUtil.generateToken(any(User.class))).willReturn(AUTHORIZATION_TOKEN);
 
         mockMvc.perform(post("/api/v1/register")
                 .content(jsonContent)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.token", is("token")))
+                .andExpect(jsonPath("$.token", is(AUTHORIZATION_TOKEN)))
                 .andExpect(status().isOk())
                 .andDo(document("v1/user-register",
                     preprocessRequest(prettyPrint()),
@@ -109,6 +113,42 @@ public class AuthControllerTest {
                     responseFields(
                             fieldWithPath("token").description("Authentication token")
                     )
+                ));
+    }
+
+    @Test
+    void authenticate_user() throws Exception {
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest();
+        authenticationRequest.setEmail("john@example.com");
+        authenticationRequest.setPassword("12345678");
+
+        given(userDetailsService.loadUserByUsername(anyString())).willReturn(new User());
+        given(jwtUtil.generateToken(any(User.class))).willReturn(AUTHORIZATION_TOKEN);
+
+        ConstraintDescriptions authenticationConstraints = new ConstraintDescriptions(RegistrationRequest.class);
+
+        mockMvc.perform(post("/api/v1/authenticate")
+                .content(om.writeValueAsString(authenticationRequest))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token", is(AUTHORIZATION_TOKEN)))
+                .andDo(document("v1/user-authenticate",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                attributes(key("title").value("Fields for user authentication")),
+                                fieldWithPath("email")
+                                        .type(JsonFieldType.STRING)
+                                        .description("User's email")
+                                        .attributes(key("constraints").value(authenticationConstraints.descriptionsForProperty("email"))),
+                                fieldWithPath("password")
+                                        .type(JsonFieldType.STRING)
+                                        .description("User's password")
+                                        .attributes(key("constraints").value(authenticationConstraints.descriptionsForProperty("password")))
+                        ),
+                        responseFields(
+                                fieldWithPath("token").description("Authentication token")
+                        )
                 ));
     }
 }
