@@ -1,5 +1,6 @@
 package eu.kalodiodev.controlmycar.services.jpa;
 
+import eu.kalodiodev.controlmycar.exceptions.UserAlreadyExistsException;
 import eu.kalodiodev.controlmycar.services.RoleService;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.repositories.UserRepository;
@@ -31,6 +32,11 @@ public class JpaUserServiceImpl implements UserService {
 
     @Override
     public User register(RegistrationRequest registrationRequest) {
+
+        if(userRepository.findByEmail(registrationRequest.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException("Cannot register user with email " + registrationRequest.getEmail());
+        }
+
         User user = new User();
         user.setFirstName(registrationRequest.getFirstName());
         user.setLastName(registrationRequest.getLastName());
