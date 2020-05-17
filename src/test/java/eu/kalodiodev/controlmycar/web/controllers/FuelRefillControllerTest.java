@@ -2,10 +2,12 @@ package eu.kalodiodev.controlmycar.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.kalodiodev.controlmycar.SecurityTestConfig;
+import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.services.FuelRefillService;
 import eu.kalodiodev.controlmycar.services.security.JwtUtil;
 import eu.kalodiodev.controlmycar.web.model.FuelRefillDto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,6 +28,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,6 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(SecurityTestConfig.class)
 @WithMockUser("testUser")
 class FuelRefillControllerTest {
+
+    private static final String AUTHORIZATION_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNTg5MTQzODYxLCJpYXQiOjE1ODkxMjU4NjF9.M40eLliTLQK9G4YpIPYsNNoSERobwzLGmLQiY-w9_0fD2DLd0Sm4D1wPAMuLaMRrjlsAPqZ_jwoeGBuKUIKz0g";
 
     @MockBean
     JwtUtil jwtUtil;
@@ -48,6 +53,18 @@ class FuelRefillControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    User authenticatedUser;
+
+    @BeforeEach
+    void setUp() {
+        authenticatedUser = new User();
+        authenticatedUser.setId(1L);
+        authenticatedUser.setEmail("test@example.com");
+        authenticatedUser.setFirstName("John");
+        authenticatedUser.setLastName("Doe");
+    }
+
+
     @Test
     void all_car_fuel_refills() throws Exception {
         List<FuelRefillDto> refills = new ArrayList<>();
@@ -56,7 +73,8 @@ class FuelRefillControllerTest {
 
         given(fuelRefillService.findAllByUserIdAndByCarId(anyLong(), anyLong())).willReturn(refills);
 
-        mockMvc.perform(get("/api/v1/users/1/cars/1/fuelrefills"))
+        mockMvc.perform(get("/api/v1/cars/1/fuelrefills").with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is(1)))
@@ -69,7 +87,8 @@ class FuelRefillControllerTest {
 
         given(fuelRefillService.save(1L, 1L, fuelRefillDto)).willReturn(fuelRefillDto);
 
-        mockMvc.perform(post("/api/v1/users/1/cars/1/fuelrefills")
+        mockMvc.perform(post("/api/v1/cars/1/fuelrefills").with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN)
                 .content(om.writeValueAsString(fuelRefillDto))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -83,7 +102,9 @@ class FuelRefillControllerTest {
 
         given(fuelRefillService.update(1L, 1L, 1L, fuelRefillDto)).willReturn(fuelRefillDto);
 
-        mockMvc.perform(patch("/api/v1/users/1/cars/1/fuelrefills/1")
+        mockMvc.perform(patch("/api/v1/cars/1/fuelrefills/1")
+                .with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN)
                 .content(om.writeValueAsString(fuelRefillDto))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -96,7 +117,9 @@ class FuelRefillControllerTest {
         given(fuelRefillService.update(1L, 1L, 1L, fuelRefillDto))
                 .willThrow(NotFoundException.class);
 
-        mockMvc.perform(patch("/api/v1/users/1/cars/1/fuelrefills/1")
+        mockMvc.perform(patch("/api/v1/cars/1/fuelrefills/1")
+                .with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN)
                 .content(om.writeValueAsString(fuelRefillDto))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -104,7 +127,9 @@ class FuelRefillControllerTest {
 
     @Test
     void delete_fuel_refill() throws Exception {
-        mockMvc.perform(delete("/api/v1/users/1/cars/1/fuelrefills/1"))
+        mockMvc.perform(delete("/api/v1/cars/1/fuelrefills/1")
+                .with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN))
                 .andExpect(status().isNoContent());
 
         verify(fuelRefillService, times(1)).delete(1L, 1L, 1L);
