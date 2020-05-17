@@ -1,6 +1,7 @@
 package eu.kalodiodev.controlmycar.services.jpa;
 
 import eu.kalodiodev.controlmycar.domains.Role;
+import eu.kalodiodev.controlmycar.exceptions.UserAlreadyExistsException;
 import eu.kalodiodev.controlmycar.services.RoleService;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.repositories.UserRepository;
@@ -12,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,5 +64,15 @@ class JpaUserServiceImplTest {
         given(passwordEncoder.encode(anyString())).willReturn("asdffdsadf");
 
         assertEquals(user1, userService.register(registrationRequest));
+    }
+
+    @Test
+    void register_user_that_already_exists() {
+        RegistrationRequest registerRequest = new RegistrationRequest();
+        registerRequest.setEmail("test@example.com");
+
+        given(userRepository.findByEmail(anyString())).willReturn(Optional.of(new User()));
+
+        assertThrows(UserAlreadyExistsException.class, () -> { userService.register(registerRequest); });
     }
 }
