@@ -1,15 +1,12 @@
 package eu.kalodiodev.controlmycar.web.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.kalodiodev.controlmycar.domains.User;
-import eu.kalodiodev.controlmycar.services.UserService;
-import eu.kalodiodev.controlmycar.services.security.JwtUtil;
 
+import eu.kalodiodev.controlmycar.services.UserService;
 import eu.kalodiodev.controlmycar.web.model.authentication.AuthenticationRequest;
 import eu.kalodiodev.controlmycar.web.model.authentication.RegistrationRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,10 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,22 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(RestDocumentationExtension.class)
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "control-my-car.kalodiodev.eu")
 @WebMvcTest(value = AuthController.class)
-@ActiveProfiles("test")
-public class AuthControllerTest {
-
-    private static final String AUTHORIZATION_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNTg5MTQzODYxLCJpYXQiOjE1ODkxMjU4NjF9.M40eLliTLQK9G4YpIPYsNNoSERobwzLGmLQiY-w9_0fD2DLd0Sm4D1wPAMuLaMRrjlsAPqZ_jwoeGBuKUIKz0g";
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    ObjectMapper om;
-
-    @MockBean
-    JwtUtil jwtUtil;
-
-    @MockBean
-    AuthenticationManager authenticationManager;
+public class AuthControllerTest extends BaseControllerTest {
 
     @MockBean
     UserDetailsService userDetailsService;

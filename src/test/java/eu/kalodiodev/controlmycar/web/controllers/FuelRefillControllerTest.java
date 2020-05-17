@@ -1,23 +1,17 @@
 package eu.kalodiodev.controlmycar.web.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.kalodiodev.controlmycar.SecurityTestConfig;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.services.FuelRefillService;
-import eu.kalodiodev.controlmycar.services.security.JwtUtil;
 import eu.kalodiodev.controlmycar.web.model.FuelRefillDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,24 +28,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(FuelRefillController.class)
-@ActiveProfiles("test")
 @Import(SecurityTestConfig.class)
-@WithMockUser("testUser")
-class FuelRefillControllerTest {
-
-    private static final String AUTHORIZATION_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNTg5MTQzODYxLCJpYXQiOjE1ODkxMjU4NjF9.M40eLliTLQK9G4YpIPYsNNoSERobwzLGmLQiY-w9_0fD2DLd0Sm4D1wPAMuLaMRrjlsAPqZ_jwoeGBuKUIKz0g";
-
-    @MockBean
-    JwtUtil jwtUtil;
+class FuelRefillControllerTest extends BaseControllerTest {
 
     @MockBean
     FuelRefillService fuelRefillService;
-
-    @Autowired
-    ObjectMapper om;
-
-    @Autowired
-    MockMvc mockMvc;
 
     User authenticatedUser;
 
@@ -63,7 +44,6 @@ class FuelRefillControllerTest {
         authenticatedUser.setFirstName("John");
         authenticatedUser.setLastName("Doe");
     }
-
 
     @Test
     void all_car_fuel_refills() throws Exception {
