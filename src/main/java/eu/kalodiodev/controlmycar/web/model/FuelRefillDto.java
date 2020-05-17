@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
@@ -16,7 +18,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FuelRefillDto {
+@Relation(value = "fuelRefill", collectionRelation = "fuelRefills")
+public class FuelRefillDto extends RepresentationModel<FuelRefillDto> {
 
     @Null
     private Long id;

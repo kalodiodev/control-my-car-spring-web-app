@@ -56,9 +56,9 @@ class FuelRefillControllerTest extends BaseControllerTest {
         mockMvc.perform(get("/api/v1/cars/1/fuelrefills").with(user(authenticatedUser))
                 .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[1].id", is(2)));
+                .andExpect(jsonPath("$._embedded.fuelRefills", hasSize(2)))
+                .andExpect(jsonPath("$._embedded.fuelRefills[0].id", is(1)))
+                .andExpect(jsonPath("$._embedded.fuelRefills[1].id", is(2)));
     }
 
     @Test
