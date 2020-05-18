@@ -41,8 +41,13 @@ public class FuelRefillController {
     public ResponseEntity<FuelRefillDto> addFuelRefill(@AuthenticationPrincipal User user,
                                                        @PathVariable Long carId,
                                                        @RequestBody @Valid FuelRefillDto fuelRefillDto) {
+        FuelRefillDto savedFuelRefill =  fuelRefillService.save(user.getId(), carId, fuelRefillDto);
 
-        return new ResponseEntity<>(fuelRefillService.save(user.getId(), carId, fuelRefillDto), HttpStatus.CREATED);
+        Link fuelRefillsLink = linkTo(methodOn(FuelRefillController.class).getAllFuelRefillsOfCar(user, carId))
+                .withRel("car-fuel-refills");
+        savedFuelRefill.add(fuelRefillsLink);
+
+        return new ResponseEntity<>(savedFuelRefill, HttpStatus.CREATED);
     }
 
     @PatchMapping("fuelrefills/{fuelRefillId}")
