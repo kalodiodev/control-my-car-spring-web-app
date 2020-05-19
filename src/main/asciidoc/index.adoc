@@ -201,3 +201,31 @@ include::{snippets}/v1/car-delete/path-parameters.adoc[]
 .Car HTTP response:
 
 include::{snippets}/v1/car-delete/http-response.adoc[]
+
+== Fuel Refill
+
+This is the documentation of the resource Fuel Refills API.
+
+=== List car fuel refills
+
+.Request fuel refills list using cURL:
+
+include::{snippets}/v1/fuelrefills/curl-request.adoc[]
+
+.Fuel refills list HTTP request:
+
+include::{snippets}/v1/fuelrefills/http-request.adoc[]
+
+.Fuel refills List request headers:
+
+include::{snippets}/v1/fuelrefills/request-headers.adoc[]
+
+.Fuel refills list HTTP response:
+
+include::{snippets}/v1/fuelrefills/http-response.adoc[]
+
+.Response Body:
+include::{snippets}/v1/fuelrefills/response-body.adoc[]
+
+.Response Fields:
+include::{snippets}/v1/fuelrefills/response-fields.adoc[]
