@@ -1,2 +1,6 @@
 # Control My Car
-An application built in Spring Framework that aims to help users to control car expenses.
+A REST application built in Spring Framework, that aims to help users to manage car expenses.
+ 
+Users can store their cars, fuelrefills and services.
+
+This application created for Spring Boot Rest API development demonstration.
