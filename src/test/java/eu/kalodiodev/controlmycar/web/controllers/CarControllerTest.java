@@ -165,8 +165,6 @@ public class CarControllerTest extends BaseControllerTest {
                 .replace("\"userId\":null,", "")
                 .replace(",\"links\":[]", "");
 
-        System.out.println(jsonContent);
-
         mockMvc.perform(post("/api/v1/cars")
                     .with(user(authenticatedUser)
                 )

@@ -4,6 +4,7 @@ import eu.kalodiodev.controlmycar.SecurityTestConfig;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.services.FuelRefillService;
+import eu.kalodiodev.controlmycar.web.model.CarDto;
 import eu.kalodiodev.controlmycar.web.model.FuelRefillDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 
@@ -29,10 +31,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.snippet.Attributes.attributes;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 //import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -107,16 +112,42 @@ class FuelRefillControllerTest extends BaseControllerTest {
     @Test
     void save_fuel_refill() throws Exception {
         FuelRefillDto fuelRefillDto = getValidFuelRefillDto();
+        FuelRefillDto savedFuelRefillDto = getValidFuelRefillDto();
+        savedFuelRefillDto.setId(1L);
+        savedFuelRefillDto.setCarId(1L);
 
-        given(fuelRefillService.save(1L, 1L, fuelRefillDto)).willReturn(fuelRefillDto);
+        given(fuelRefillService.save(1L, 1L, fuelRefillDto)).willReturn(savedFuelRefillDto);
 
-        mockMvc.perform(post("/api/v1/cars/1/fuelrefills").with(user(authenticatedUser))
+        String jsonContent = om.writeValueAsString(fuelRefillDto)
+                .replace("\"id\":null,", "")
+                .replace("\"carId\":null,", "")
+                .replace(",\"links\":[]", "");
+
+        mockMvc.perform(post("/api/v1/cars/{carId}/fuelrefills", 1L).with(user(authenticatedUser))
                 .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN)
-                .content(om.writeValueAsString(fuelRefillDto))
+                .content(jsonContent)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.cost", is(20.0)))
-                .andExpect(jsonPath("$.volume", is(15.0)));
+                .andExpect(jsonPath("$.volume", is(15.0)))
+                .andDo(document("v1/fuelrefill-create",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
+                        links(
+                                halLinks(),
+                                linkWithRel("car-fuel-refills").description("Link to all car's fuel refills")
+                        ),
+                        requestFields(
+                                attributes(key("title").value("Fields for fuel refill creation")),
+                                fuelRefillRequestFieldsDescriptor()
+                        ),
+                        responseFields(
+                                fuelRefillFieldsDescriptor()
+                        )
+                ));
     }
 
     @Test
@@ -170,18 +201,95 @@ class FuelRefillControllerTest extends BaseControllerTest {
                 .build();
     }
 
+    private FieldDescriptor[] fuelRefillRequestFieldsDescriptor() {
+        ConstraintDescriptions fuelRefillConstraints = new ConstraintDescriptions(CarDto.class);
+
+        return new FieldDescriptor[] {
+                fieldWithPath("date")
+                        .type(JsonFieldType.STRING)
+                        .description("Fuel refill date")
+                        .attributes(key("constraints")
+                        .value(fuelRefillConstraints.descriptionsForProperty("date"))),
+                fieldWithPath("odometer")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Odometer reading")
+                        .attributes(key("constraints")
+                        .value(fuelRefillConstraints.descriptionsForProperty("odometer"))),
+                fieldWithPath("volume")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Fuel volume")
+                        .attributes(key("constraints")
+                        .value(fuelRefillConstraints.descriptionsForProperty("volume"))),
+                fieldWithPath("cost")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Fuel refill total cost")
+                        .attributes(key("constraints")
+                        .value(fuelRefillConstraints.descriptionsForProperty("cost"))),
+                fieldWithPath("fullRefill")
+                        .type(JsonFieldType.BOOLEAN)
+                        .description("Was a full refill")
+                        .attributes(key("constraints")
+                        .value(fuelRefillConstraints.descriptionsForProperty("fullRefill"))),
+                fieldWithPath("details")
+                        .type(JsonFieldType.STRING)
+                        .description("Other details and comments")
+                        .attributes(key("constraints")
+                        .value(fuelRefillConstraints.descriptionsForProperty("details"))),
+                fieldWithPath("gasStation")
+                        .type(JsonFieldType.STRING)
+                        .description("Gas station that fuel refill took place")
+                        .attributes(key("constraints")
+                        .value(fuelRefillConstraints.descriptionsForProperty("gasStation")))
+        };
+    }
+
+    FieldDescriptor[] fuelRefillFieldsDescriptor() {
+        return new FieldDescriptor[] {
+                fieldWithPath("id").type(JsonFieldType.NUMBER).description("Fuel refill id"),
+                fieldWithPath("date").type(JsonFieldType.STRING).description("Fuel refill date"),
+                fieldWithPath("odometer").type(JsonFieldType.NUMBER).description("Odometer reading"),
+                fieldWithPath("volume").type(JsonFieldType.NUMBER).description("Fuel volume"),
+                fieldWithPath("cost").type(JsonFieldType.NUMBER).description("Refill total cost"),
+                fieldWithPath("fullRefill").type(JsonFieldType.BOOLEAN).description("Was a full refill"),
+                fieldWithPath("details").type(JsonFieldType.STRING).description("Other details and comments"),
+                fieldWithPath("gasStation").type(JsonFieldType.STRING).description("Gas station that fuel refill took place"),
+                fieldWithPath("carId").type(JsonFieldType.NUMBER).description("The id of the car"),
+                subsectionWithPath("_links").ignored()
+        };
+    }
+
     FieldDescriptor[] fuelRefillsListFieldsDescriptor() {
         return new FieldDescriptor[] {
-                fieldWithPath("_embedded.fuelRefills").type(JsonFieldType.ARRAY).description("Fuel refills list"),
-                fieldWithPath("_embedded.fuelRefills[].id").type(JsonFieldType.NUMBER).description("Fuel refill Id"),
-                fieldWithPath("_embedded.fuelRefills[].date").type(JsonFieldType.STRING).description("Date of refill"),
-                fieldWithPath("_embedded.fuelRefills[].odometer").type(JsonFieldType.NUMBER).description("Odometer reading"),
-                fieldWithPath("_embedded.fuelRefills[].volume").type(JsonFieldType.NUMBER).description("Fuel volume"),
-                fieldWithPath("_embedded.fuelRefills[].cost").type(JsonFieldType.NUMBER).description("Refill total cost"),
-                fieldWithPath("_embedded.fuelRefills[].fullRefill").type(JsonFieldType.BOOLEAN).description("Was a full refill"),
-                fieldWithPath("_embedded.fuelRefills[].details").type(JsonFieldType.STRING).description("Other details and comments"),
-                fieldWithPath("_embedded.fuelRefills[].gasStation").type(JsonFieldType.STRING).description("Gas station that fuel refill took place"),
-                fieldWithPath("_embedded.fuelRefills[].carId").type(JsonFieldType.NUMBER).description("The id of the car"),
+                fieldWithPath("_embedded.fuelRefills")
+                        .type(JsonFieldType.ARRAY)
+                        .description("Fuel refills list"),
+                fieldWithPath("_embedded.fuelRefills[].id")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Fuel refill Id"),
+                fieldWithPath("_embedded.fuelRefills[].date")
+                        .type(JsonFieldType.STRING)
+                        .description("Date of refill"),
+                fieldWithPath("_embedded.fuelRefills[].odometer")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Odometer reading"),
+                fieldWithPath("_embedded.fuelRefills[].volume")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Fuel volume"),
+                fieldWithPath("_embedded.fuelRefills[].cost")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Refill total cost"),
+                fieldWithPath("_embedded.fuelRefills[].fullRefill")
+                        .type(JsonFieldType.BOOLEAN)
+                        .description("Was a full refill"),
+                fieldWithPath("_embedded.fuelRefills[].details")
+                        .type(JsonFieldType.STRING)
+                        .description("Other details and comments"),
+                fieldWithPath("_embedded.fuelRefills[].gasStation")
+                        .type(JsonFieldType.STRING)
+                        .description("Gas station that fuel refill took place"),
+                fieldWithPath("_embedded.fuelRefills[].carId")
+                        .type(JsonFieldType.NUMBER)
+                        .description("The id of the car"),
                 subsectionWithPath("_links").ignored()
         };
     }

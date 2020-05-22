@@ -202,9 +202,12 @@ include::{snippets}/v1/car-delete/path-parameters.adoc[]
 
 include::{snippets}/v1/car-delete/http-response.adoc[]
 
+
+
 == Fuel Refill
 
 This is the documentation of the resource Fuel Refills API.
+
 
 === List car fuel refills
 
@@ -229,3 +232,32 @@ include::{snippets}/v1/fuelrefills/response-body.adoc[]
 
 .Response Fields:
 include::{snippets}/v1/fuelrefills/response-fields.adoc[]
+
+
+=== Create car fuel refill
+
+.Post a fuel refill using cURL:
+
+include::{snippets}/v1/fuelrefill-create/curl-request.adoc[]
+
+.Fuel refill POST HTTP request:
+
+include::{snippets}/v1/fuelrefill-create/http-request.adoc[]
+
+.Create Fuel refill request headers:
+
+include::{snippets}/v1/fuelrefill-create/request-headers.adoc[]
+
+.Create Fuel refill request fields:
+
+include::{snippets}/v1/fuelrefill-create/request-fields.adoc[]
+
+.Fuel refill HTTP response:
+
+include::{snippets}/v1/fuelrefill-create/http-response.adoc[]
+
+.Response Body:
+include::{snippets}/v1/fuelrefill-create/response-body.adoc[]
+
+.Response Fields:
+include::{snippets}/v1/fuelrefill-create/response-fields.adoc[]
