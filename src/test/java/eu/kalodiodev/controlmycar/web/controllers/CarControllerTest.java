@@ -218,7 +218,7 @@ public class CarControllerTest extends BaseControllerTest {
                                 parameterWithName("carId").description("Id of the car to update")
                         ),
                         requestFields(
-                                attributes(key("title").value("Fields for car creation")),
+                                attributes(key("title").value("Fields for car update")),
                                 carRequestFieldsDescriptor()
                         )
                 ));

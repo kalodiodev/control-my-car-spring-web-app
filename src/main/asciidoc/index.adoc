@@ -248,6 +248,10 @@ include::{snippets}/v1/fuelrefill-create/http-request.adoc[]
 
 include::{snippets}/v1/fuelrefill-create/request-headers.adoc[]
 
+.Create Fuel refill path parameters:
+
+include::{snippets}/v1/fuelrefill-create/path-parameters.adoc[]
+
 .Create Fuel refill request fields:
 
 include::{snippets}/v1/fuelrefill-create/request-fields.adoc[]
@@ -261,3 +265,30 @@ include::{snippets}/v1/fuelrefill-create/response-body.adoc[]
 
 .Response Fields:
 include::{snippets}/v1/fuelrefill-create/response-fields.adoc[]
+
+
+=== Update car fuel refill
+
+.Patch a fuel refill using cURL:
+
+include::{snippets}/v1/fuelrefill-update/curl-request.adoc[]
+
+.Fuel refill PATCH HTTP request:
+
+include::{snippets}/v1/fuelrefill-update/http-request.adoc[]
+
+.Update Fuel refill request headers:
+
+include::{snippets}/v1/fuelrefill-update/request-headers.adoc[]
+
+.Fuel refill update path parameters:
+
+include::{snippets}/v1/fuelrefill-update/path-parameters.adoc[]
+
+.Update Fuel refill request fields:
+
+include::{snippets}/v1/fuelrefill-update/request-fields.adoc[]
+
+.Fuel refill HTTP response:
+
+include::{snippets}/v1/fuelrefill-update/http-response.adoc[]

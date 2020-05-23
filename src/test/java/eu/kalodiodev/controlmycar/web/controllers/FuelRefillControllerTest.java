@@ -36,6 +36,8 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.snippet.Attributes.attributes;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -136,6 +138,9 @@ class FuelRefillControllerTest extends BaseControllerTest {
                         requestHeaders(
                                 headerWithName("Authorization").description("JWT authentication")
                         ),
+                        pathParameters(
+                                parameterWithName("carId").description("Id of the car")
+                        ),
                         links(
                                 halLinks(),
                                 linkWithRel("car-fuel-refills").description("Link to all car's fuel refills")
@@ -154,14 +159,37 @@ class FuelRefillControllerTest extends BaseControllerTest {
     void update_fuel_refill() throws Exception {
         FuelRefillDto fuelRefillDto = getValidFuelRefillDto();
 
-        given(fuelRefillService.update(1L, 1L, 1L, fuelRefillDto)).willReturn(fuelRefillDto);
+        FuelRefillDto updatedFuelRefillDto = getValidFuelRefillDto();
+        updatedFuelRefillDto.setId(1L);
+        updatedFuelRefillDto.setCarId(1L);
 
-        mockMvc.perform(patch("/api/v1/cars/1/fuelrefills/1")
+        String jsonContent = om.writeValueAsString(fuelRefillDto)
+                .replace("\"id\":null,", "")
+                .replace("\"carId\":null,", "")
+                .replace(",\"links\":[]", "");
+
+        given(fuelRefillService.update(1L, 1L, 1L, fuelRefillDto)).willReturn(updatedFuelRefillDto);
+
+        mockMvc.perform(patch("/api/v1/cars/{carId}/fuelrefills/{fuelRefillId}", 1L, 1L)
                 .with(user(authenticatedUser))
                 .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN)
-                .content(om.writeValueAsString(fuelRefillDto))
+                .content(jsonContent)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("v1/fuelrefill-update",
+                        preprocessRequest(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
+                        pathParameters(
+                                parameterWithName("carId").description("Id of the car"),
+                                parameterWithName("fuelRefillId").description("Id of the fuel refill")
+                        ),
+                        requestFields(
+                                attributes(key("title").value("Fields for fuel refill update")),
+                                fuelRefillRequestFieldsDescriptor()
+                        )
+                ));
     }
 
     @Test
@@ -202,7 +230,7 @@ class FuelRefillControllerTest extends BaseControllerTest {
     }
 
     private FieldDescriptor[] fuelRefillRequestFieldsDescriptor() {
-        ConstraintDescriptions fuelRefillConstraints = new ConstraintDescriptions(CarDto.class);
+        ConstraintDescriptions fuelRefillConstraints = new ConstraintDescriptions(FuelRefillDto.class);
 
         return new FieldDescriptor[] {
                 fieldWithPath("date")
