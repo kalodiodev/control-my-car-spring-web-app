@@ -292,3 +292,26 @@ include::{snippets}/v1/fuelrefill-update/request-fields.adoc[]
 .Fuel refill HTTP response:
 
 include::{snippets}/v1/fuelrefill-update/http-response.adoc[]
+
+
+=== Delete car fuel refill
+
+.Delete fuel refill using cURL:
+
+include::{snippets}/v1/fuelrefill-delete/curl-request.adoc[]
+
+.Fuel fefill HTTP DELETE request:
+
+include::{snippets}/v1/fuelrefill-delete/http-request.adoc[]
+
+.Fuel refill delete request headers:
+
+include::{snippets}/v1/fuelrefill-delete/request-headers.adoc[]
+
+.Fuel refill delete path parameters:
+
+include::{snippets}/v1/fuelrefill-delete/path-parameters.adoc[]
+
+.Fuel refill HTTP response:
+
+include::{snippets}/v1/fuelrefill-delete/http-response.adoc[]

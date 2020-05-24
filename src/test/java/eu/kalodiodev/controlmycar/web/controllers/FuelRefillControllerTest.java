@@ -209,10 +209,19 @@ class FuelRefillControllerTest extends BaseControllerTest {
 
     @Test
     void delete_fuel_refill() throws Exception {
-        mockMvc.perform(delete("/api/v1/cars/1/fuelrefills/1")
+        mockMvc.perform(delete("/api/v1/cars/{carId}/fuelrefills/{fuelRefillId}", 1L, 1L)
                 .with(user(authenticatedUser))
                 .header(HttpHeaders.AUTHORIZATION,"Bearer " + AUTHORIZATION_TOKEN))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("v1/fuelrefill-delete",
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
+                        pathParameters(
+                                parameterWithName("carId").description("Id of the car that the fuel refill belongs to"),
+                                parameterWithName("fuelRefillId").description("Id of the fuel refill to deleted")
+                        )
+                ));
 
         verify(fuelRefillService, times(1)).delete(1L, 1L, 1L);
     }
