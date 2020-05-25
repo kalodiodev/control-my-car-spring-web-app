@@ -43,4 +43,7 @@ public class Car {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "car")
     private List<FuelRefill> fuelRefills = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "car")
+    private List<Service> services = new ArrayList<>();
 }
