@@ -1,6 +1,8 @@
 package eu.kalodiodev.controlmycar.services.jpa;
 
+import eu.kalodiodev.controlmycar.converter.ServiceDtoToService;
 import eu.kalodiodev.controlmycar.converter.ServiceToServiceDto;
+import eu.kalodiodev.controlmycar.domains.Car;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.repositories.CarRepository;
 import eu.kalodiodev.controlmycar.repositories.ServiceRepository;
@@ -17,11 +19,13 @@ public class JpaServiceServiceImpl implements ServiceService {
     private final ServiceRepository serviceRepository;
     private final CarRepository carRepository;
     private final ServiceToServiceDto serviceToServiceDto;
+    private final ServiceDtoToService serviceDtoToService;
 
-    public JpaServiceServiceImpl(ServiceRepository serviceRepository, CarRepository carRepository, ServiceToServiceDto serviceToServiceDto) {
+    public JpaServiceServiceImpl(ServiceRepository serviceRepository, CarRepository carRepository, ServiceToServiceDto serviceToServiceDto, ServiceDtoToService serviceDtoToService) {
         this.serviceRepository = serviceRepository;
         this.carRepository = carRepository;
         this.serviceToServiceDto = serviceToServiceDto;
+        this.serviceDtoToService = serviceDtoToService;
     }
 
     @Override
@@ -32,5 +36,15 @@ public class JpaServiceServiceImpl implements ServiceService {
                 .stream()
                 .map(serviceToServiceDto::convert)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ServiceDto save(Long userId, Long carId, ServiceDto serviceDto) {
+        Car car = carRepository.findCarByIdAndUserId(carId, userId).orElseThrow(NotFoundException::new);
+
+        serviceDto.setCarId(car.getId());
+        eu.kalodiodev.controlmycar.domains.Service service =  serviceRepository.save(serviceDtoToService.convert(serviceDto));
+
+        return serviceToServiceDto.convert(service);
     }
 }

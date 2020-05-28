@@ -5,12 +5,12 @@ import eu.kalodiodev.controlmycar.services.ServiceService;
 import eu.kalodiodev.controlmycar.web.model.ServiceDto;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -35,5 +35,19 @@ public class ServiceController {
         Link link = linkTo(methodOn(ServiceController.class).getAllServicesOfCar(user, carId)).withSelfRel();
 
         return new CollectionModel<>(services, link);
+    }
+
+    @PostMapping("services")
+    public ResponseEntity<ServiceDto> addService(@AuthenticationPrincipal User user,
+                                                 @PathVariable Long carId,
+                                                 @RequestBody @Valid ServiceDto serviceDto) {
+        ServiceDto savedServiceDto = serviceService.save(user.getId(), carId, serviceDto);
+
+        Link servicesLink = linkTo(methodOn(ServiceController.class).getAllServicesOfCar(user, carId))
+                .withRel("car-services");
+
+        savedServiceDto.add(servicesLink);
+
+        return new ResponseEntity<>(savedServiceDto, HttpStatus.CREATED);
     }
 }

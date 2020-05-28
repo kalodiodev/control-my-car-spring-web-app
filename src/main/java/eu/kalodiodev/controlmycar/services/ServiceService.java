@@ -7,4 +7,6 @@ import java.util.List;
 public interface ServiceService {
 
     List<ServiceDto> findAllByUserIdAndByCarId(Long userId, Long carId);
+
+    ServiceDto save(Long id, Long carId, ServiceDto serviceDto);
 }

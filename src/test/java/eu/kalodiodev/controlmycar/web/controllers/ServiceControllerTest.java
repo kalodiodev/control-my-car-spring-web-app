@@ -12,7 +12,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 
@@ -25,10 +27,14 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.snippet.Attributes.attributes;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -97,7 +103,93 @@ class ServiceControllerTest extends BaseControllerTest {
                 ));
     }
 
-    FieldDescriptor[] serviceFieldsDescriptor() {
+    @Test
+    void save_service() throws Exception {
+        ServiceDto serviceDto = getValidServiceDto();
+        ServiceDto savedServiceDto = getValidServiceDto();
+        savedServiceDto.setId(1L);
+        savedServiceDto.setCarId(1L);
+
+        given(serviceService.save(1L, 1L, serviceDto)).willReturn(savedServiceDto);
+
+        String jsonContent = om.writeValueAsString(serviceDto)
+                .replace("\"id\":null,", "")
+                .replace("\"carId\":null,", "")
+                .replace(",\"links\":[]", "");
+
+        mockMvc.perform(post("/api/v1/cars/{carId}/services", 1L).with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AUTHORIZATION_TOKEN)
+                .content(jsonContent)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.cost", is(20.0)))
+                .andExpect(jsonPath("$.title", is("Service title")))
+                .andDo(document("v1/service-create",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
+                        pathParameters(
+                                parameterWithName("carId").description("Id of the car")
+                        ),
+                        links(
+                                halLinks(),
+                                linkWithRel("car-services").description("Link to all car's services")
+                        ),
+                        requestFields(
+                                attributes(key("title").value("Fields for service creation")),
+                                serviceRequestFieldsDescriptor()
+                        ),
+                        responseFields(
+                                serviceFieldsDescriptor()
+                        )
+                ));
+    }
+
+    private ServiceDto getValidServiceDto() {
+        return ServiceDto.builder()
+                .date(LocalDate.now())
+                .title("Service title")
+                .description("Service description")
+                .odometer(132434d)
+                .cost(20d)
+                .build();
+    }
+
+    private FieldDescriptor[] serviceRequestFieldsDescriptor() {
+        ConstraintDescriptions serviceConstraints = new ConstraintDescriptions(ServiceDto.class);
+
+        return new FieldDescriptor[] {
+                fieldWithPath("date")
+                        .type(JsonFieldType.STRING)
+                        .description("Service date")
+                        .attributes(key("constraints")
+                        .value(serviceConstraints.descriptionsForProperty("date"))),
+                fieldWithPath("title")
+                        .type(JsonFieldType.STRING)
+                        .description("Service title")
+                        .attributes(key("constraints")
+                        .value(serviceConstraints.descriptionsForProperty("title"))),
+                fieldWithPath("description")
+                        .type(JsonFieldType.STRING)
+                        .description("Service description")
+                        .attributes(key("constraints")
+                        .value(serviceConstraints.descriptionsForProperty("description"))),
+                fieldWithPath("odometer")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Odometer reading")
+                        .attributes(key("constraints")
+                        .value(serviceConstraints.descriptionsForProperty("odometer"))),
+                fieldWithPath("cost")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Service total cost")
+                        .attributes(key("constraints")
+                        .value(serviceConstraints.descriptionsForProperty("cost")))
+        };
+    }
+
+    private FieldDescriptor[] serviceFieldsDescriptor() {
         return new FieldDescriptor[] {
                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("Service id"),
                 fieldWithPath("date").type(JsonFieldType.STRING).description("Service date"),
@@ -110,7 +202,7 @@ class ServiceControllerTest extends BaseControllerTest {
         };
     }
 
-    FieldDescriptor[] servicesListFieldsDescriptor() {
+    private FieldDescriptor[] servicesListFieldsDescriptor() {
         return new FieldDescriptor[]{
                 fieldWithPath("_embedded.services")
                         .type(JsonFieldType.ARRAY)

@@ -346,3 +346,35 @@ include::{snippets}/v1/services/response-body.adoc[]
 
 .Response Fields:
 include::{snippets}/v1/services/response-fields.adoc[]
+
+=== Create car service
+
+.Post a service using cURL:
+
+include::{snippets}/v1/service-create/curl-request.adoc[]
+
+.Service POST HTTP request:
+
+include::{snippets}/v1/service-create/http-request.adoc[]
+
+.Create Service request headers:
+
+include::{snippets}/v1/service-create/request-headers.adoc[]
+
+.Create Service path parameters:
+
+include::{snippets}/v1/service-create/path-parameters.adoc[]
+
+.Create Service request fields:
+
+include::{snippets}/v1/service-create/request-fields.adoc[]
+
+.Service HTTP response:
+
+include::{snippets}/v1/service-create/http-response.adoc[]
+
+.Response Body:
+include::{snippets}/v1/service-create/response-body.adoc[]
+
+.Response Fields:
+include::{snippets}/v1/service-create/response-fields.adoc[]
