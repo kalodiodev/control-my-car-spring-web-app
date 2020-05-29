@@ -50,4 +50,14 @@ public class ServiceController {
 
         return new ResponseEntity<>(savedServiceDto, HttpStatus.CREATED);
     }
+
+    @PatchMapping("services/{serviceId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateService(@AuthenticationPrincipal User user,
+                              @PathVariable Long carId,
+                              @PathVariable Long serviceId,
+                              @RequestBody @Valid ServiceDto serviceDto) {
+
+        serviceService.update(user.getId(), carId, serviceId, serviceDto);
+    }
 }

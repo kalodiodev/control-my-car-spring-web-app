@@ -47,4 +47,20 @@ public class JpaServiceServiceImpl implements ServiceService {
 
         return serviceToServiceDto.convert(service);
     }
+
+    @Override
+    public ServiceDto update(Long userId, Long carId, Long serviceId, ServiceDto serviceDto) {
+        Car car = carRepository.findCarByIdAndUserId(carId, userId)
+                .orElseThrow(NotFoundException::new);
+
+        eu.kalodiodev.controlmycar.domains.Service service = serviceRepository.findByIdAndCarId(serviceId, car.getId())
+                .orElseThrow(NotFoundException::new);
+
+        serviceDto.setId(service.getId());
+        serviceDto.setCarId(car.getId());
+
+        eu.kalodiodev.controlmycar.domains.Service updated = serviceRepository.save(serviceDtoToService.convert(serviceDto));
+
+        return serviceToServiceDto.convert(updated);
+    }
 }

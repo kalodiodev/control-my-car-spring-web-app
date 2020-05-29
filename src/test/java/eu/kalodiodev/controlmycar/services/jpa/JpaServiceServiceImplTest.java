@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class JpaServiceServiceImplTest {
@@ -76,5 +78,38 @@ class JpaServiceServiceImplTest {
         given(carRepository.findCarByIdAndUserId(anyLong(), anyLong())).willReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> serviceService.save(1L, 1L, serviceDto));
+    }
+
+    @Test
+    void update_service() {
+        ServiceDto serviceDto = ServiceDto.builder()
+                .carId(1L)
+                .cost(10d)
+                .build();
+
+        Car car = new Car();
+        car.setId(1L);
+
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.of(car));
+        given(serviceRepository.findByIdAndCarId(1L, 1L)).willReturn(Optional.of(new Service()));
+        given(serviceDtoToService.convert(any(ServiceDto.class))).willReturn(new Service());
+        given(serviceRepository.save(any(Service.class))).willReturn(new Service());
+        given(serviceToServiceDto.convert(any(Service.class))).willReturn(serviceDto);
+
+        ServiceDto updatedServiceDto = serviceService.update(1L, 1L, 1L, serviceDto);
+
+        assertEquals(serviceDto, updatedServiceDto);
+        verify(serviceRepository, times(1)).save(any(Service.class));
+    }
+
+    @Test
+    void update_service_not_found() {
+        Car car = new Car();
+        car.setId(1L);
+
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.of(car));
+        given(serviceRepository.findByIdAndCarId(anyLong(), anyLong())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> serviceService.update(1L, 1L, 1L, new ServiceDto()));
     }
 }

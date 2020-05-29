@@ -378,3 +378,29 @@ include::{snippets}/v1/service-create/response-body.adoc[]
 
 .Response Fields:
 include::{snippets}/v1/service-create/response-fields.adoc[]
+
+=== Update car service
+
+.Patch a service using cURL:
+
+include::{snippets}/v1/service-update/curl-request.adoc[]
+
+.Service PATCH HTTP request:
+
+include::{snippets}/v1/service-update/http-request.adoc[]
+
+.Update Service request headers:
+
+include::{snippets}/v1/service-update/request-headers.adoc[]
+
+.Service update path parameters:
+
+include::{snippets}/v1/service-update/path-parameters.adoc[]
+
+.Service request fields:
+
+include::{snippets}/v1/service-update/request-fields.adoc[]
+
+.Service HTTP response:
+
+include::{snippets}/v1/service-update/http-response.adoc[]

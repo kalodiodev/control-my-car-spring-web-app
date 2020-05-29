@@ -2,6 +2,7 @@ package eu.kalodiodev.controlmycar.web.controllers;
 
 import eu.kalodiodev.controlmycar.SecurityTestConfig;
 import eu.kalodiodev.controlmycar.domains.User;
+import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.services.ServiceService;
 import eu.kalodiodev.controlmycar.web.model.ServiceDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -143,6 +144,57 @@ class ServiceControllerTest extends BaseControllerTest {
                         ),
                         responseFields(
                                 serviceFieldsDescriptor()
+                        )
+                ));
+    }
+
+    @Test
+    void update_service_not_found() throws Exception {
+        ServiceDto serviceDto = getValidServiceDto();
+
+        given(serviceService.update(1L, 1L, 1L, serviceDto)).willThrow(NotFoundException.class);
+
+        mockMvc.perform(patch("/api/v1/cars/1/services/1")
+                .with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AUTHORIZATION_TOKEN)
+                .content(om.writeValueAsString(serviceDto))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void update_service() throws Exception {
+        ServiceDto serviceDto = getValidServiceDto();
+
+        ServiceDto updatedServiceDto = getValidServiceDto();
+        updatedServiceDto.setId(1L);
+        updatedServiceDto.setCarId(1L);
+
+        String jsonContent = om.writeValueAsString(serviceDto)
+                .replace("\"id\":null,", "")
+                .replace("\"carId\":null,", "")
+                .replace(",\"links\":[]", "");
+
+        given(serviceService.update(1L, 1L, 1L, serviceDto)).willReturn(updatedServiceDto);
+
+        mockMvc.perform(patch("/api/v1/cars/{carId}/services/{serviceId}", 1L, 1L)
+                .with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AUTHORIZATION_TOKEN)
+                .content(jsonContent)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(document("v1/service-update",
+                        preprocessRequest(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
+                        pathParameters(
+                                parameterWithName("carId").description("Id of the car"),
+                                parameterWithName("serviceId").description("Id of the service")
+                        ),
+                        requestFields(
+                                attributes(key("title").value("Fields for service update")),
+                                serviceRequestFieldsDescriptor()
                         )
                 ));
     }
