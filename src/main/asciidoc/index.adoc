@@ -404,3 +404,25 @@ include::{snippets}/v1/service-update/request-fields.adoc[]
 .Service HTTP response:
 
 include::{snippets}/v1/service-update/http-response.adoc[]
+
+=== Delete car service
+
+.Delete service using cURL:
+
+include::{snippets}/v1/service-delete/curl-request.adoc[]
+
+.Service HTTP DELETE request:
+
+include::{snippets}/v1/service-delete/http-request.adoc[]
+
+.Service delete request headers:
+
+include::{snippets}/v1/service-delete/request-headers.adoc[]
+
+.Service delete path parameters:
+
+include::{snippets}/v1/service-delete/path-parameters.adoc[]
+
+.Service HTTP response:
+
+include::{snippets}/v1/service-delete/http-response.adoc[]
