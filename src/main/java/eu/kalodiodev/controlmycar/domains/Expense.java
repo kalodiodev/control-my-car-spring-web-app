@@ -3,10 +3,7 @@ package eu.kalodiodev.controlmycar.domains;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -26,4 +23,8 @@ public class Expense {
 
     @Column
     private Double cost;
+
+    @ManyToOne
+    @JoinColumn(name = "car_id")
+    private Car car;
 }

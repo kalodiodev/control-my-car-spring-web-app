@@ -46,4 +46,7 @@ public class Car {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "car")
     private List<Service> services = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "car")
+    private List<Expense> expenses = new ArrayList<>();
 }
