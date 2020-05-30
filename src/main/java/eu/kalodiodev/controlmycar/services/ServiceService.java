@@ -11,4 +11,6 @@ public interface ServiceService {
     ServiceDto save(Long userId, Long carId, ServiceDto serviceDto);
 
     ServiceDto update(Long userId, Long carId, Long serviceId, ServiceDto serviceDto);
+
+    void delete(Long userId, Long carId, Long serviceId);
 }

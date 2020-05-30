@@ -10,7 +10,9 @@ import eu.kalodiodev.controlmycar.services.ServiceService;
 import eu.kalodiodev.controlmycar.web.model.ServiceDto;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,5 +64,15 @@ public class JpaServiceServiceImpl implements ServiceService {
         eu.kalodiodev.controlmycar.domains.Service updated = serviceRepository.save(serviceDtoToService.convert(serviceDto));
 
         return serviceToServiceDto.convert(updated);
+    }
+
+    @Transactional
+    @Override
+    public void delete(Long userId, Long carId, Long serviceId) {
+        Optional<Car> carOptional = carRepository.findCarByIdAndUserId(carId, userId);
+
+        if (carOptional.isPresent()) {
+            serviceRepository.deleteByIdAndCarId(serviceId, carId);
+        }
     }
 }

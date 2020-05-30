@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     Optional<Service> findByIdAndCarId(Long serviceId, Long carId);
+
+    void deleteByIdAndCarId(Long serviceId, Long carId);
 }

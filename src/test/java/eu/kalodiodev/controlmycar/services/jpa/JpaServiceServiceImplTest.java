@@ -20,8 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class JpaServiceServiceImplTest {
@@ -111,5 +110,26 @@ class JpaServiceServiceImplTest {
         given(serviceRepository.findByIdAndCarId(anyLong(), anyLong())).willReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> serviceService.update(1L, 1L, 1L, new ServiceDto()));
+    }
+
+    @Test
+    void delete_service() {
+        Car car = new Car();
+        car.setId(1L);
+
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.of(car));
+
+        serviceService.delete(1L, 1L, 1L);
+
+        verify(serviceRepository, times(1)).deleteByIdAndCarId(1L, 1L);
+    }
+
+    @Test
+    void delete_service_that_does_not_exist_or_belong_to_car() {
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.empty());
+
+        serviceService.delete(1L, 1L, 1L);
+
+        verifyNoInteractions(serviceRepository);
     }
 }

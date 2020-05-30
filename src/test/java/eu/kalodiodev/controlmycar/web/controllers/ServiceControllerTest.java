@@ -26,6 +26,8 @@ import java.util.List;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
@@ -197,6 +199,25 @@ class ServiceControllerTest extends BaseControllerTest {
                                 serviceRequestFieldsDescriptor()
                         )
                 ));
+    }
+
+    @Test
+    void delete_service() throws Exception {
+        mockMvc.perform(delete("/api/v1/cars/{carId}/services/{serviceId}", 1L, 1L)
+                .with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AUTHORIZATION_TOKEN))
+                .andExpect(status().isNoContent())
+                .andDo(document("v1/service-delete",
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
+                        pathParameters(
+                                parameterWithName("carId").description("Id of the car that service belongs to"),
+                                parameterWithName("serviceId").description("Id of the service to delete")
+                        )
+                ));
+
+        verify(serviceService, times(1)).delete(1L, 1L, 1L);
     }
 
     private ServiceDto getValidServiceDto() {

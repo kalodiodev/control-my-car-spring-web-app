@@ -60,4 +60,13 @@ public class ServiceController {
 
         serviceService.update(user.getId(), carId, serviceId, serviceDto);
     }
+
+    @DeleteMapping("services/{serviceId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteService(@AuthenticationPrincipal User user,
+                              @PathVariable Long carId,
+                              @PathVariable Long serviceId) {
+
+        serviceService.delete(user.getId(), carId, serviceId);
+    }
 }
