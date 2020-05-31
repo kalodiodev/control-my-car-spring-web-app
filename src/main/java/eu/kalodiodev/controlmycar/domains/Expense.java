@@ -19,6 +19,9 @@ public class Expense {
     private LocalDate date;
 
     @Column
+    private String title;
+
+    @Column
     private String description;
 
     @Column
