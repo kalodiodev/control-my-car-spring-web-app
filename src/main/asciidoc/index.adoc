@@ -426,3 +426,33 @@ include::{snippets}/v1/service-delete/path-parameters.adoc[]
 .Service HTTP response:
 
 include::{snippets}/v1/service-delete/http-response.adoc[]
+
+
+== Expense
+
+This is the documentation of the resource Expenses API.
+
+
+=== List car expenses
+
+.Request expenses list using cURL:
+
+include::{snippets}/v1/expenses/curl-request.adoc[]
+
+.Expenses list HTTP request:
+
+include::{snippets}/v1/expenses/http-request.adoc[]
+
+.Expenses List request headers:
+
+include::{snippets}/v1/expenses/request-headers.adoc[]
+
+.Expenses list HTTP response:
+
+include::{snippets}/v1/expenses/http-response.adoc[]
+
+.Response Body:
+include::{snippets}/v1/expenses/response-body.adoc[]
+
+.Response Fields:
+include::{snippets}/v1/expenses/response-fields.adoc[]

@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.time.LocalDate;
 
@@ -11,7 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ExpenseDto {
+@Relation(value = "expense", collectionRelation = "expenses")
+public class ExpenseDto  extends RepresentationModel<ExpenseDto>  {
 
     private Long id;
     private LocalDate date;
