@@ -12,7 +12,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 
@@ -22,16 +24,20 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.snippet.Attributes.attributes;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -92,12 +98,104 @@ class ExpenseControllerTest extends BaseControllerTest {
                                 headerWithName("Authorization").description("JWT authentication")
                         ),
                         responseFields(
-                                servicesListFieldsDescriptor()
+                                expensesListFieldsDescriptor()
                         )
                 ));
     }
 
-    private FieldDescriptor[] servicesListFieldsDescriptor() {
+    @Test
+    void save_service() throws Exception {
+        ExpenseDto expenseDto = getValidExpenseDto();
+        ExpenseDto savedExpenseDto = getValidExpenseDto();
+        savedExpenseDto.setId(1L);
+        savedExpenseDto.setCarId(1L);
+
+        given(expenseService.save(1L, 1L, expenseDto)).willReturn(savedExpenseDto);
+
+        String jsonContent = om.writeValueAsString(expenseDto)
+                .replace("\"id\":null,", "")
+                .replace("\"carId\":null,", "")
+                .replace(",\"links\":[]", "");
+
+        mockMvc.perform(post("/api/v1/cars/{carId}/expenses", 1L).with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AUTHORIZATION_TOKEN)
+                .content(jsonContent)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.cost", is(20.0)))
+                .andExpect(jsonPath("$.title", is("Expense title")))
+                .andDo(document("v1/expense-create",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
+                        pathParameters(
+                                parameterWithName("carId").description("Id of the car")
+                        ),
+                        links(
+                                halLinks(),
+                                linkWithRel("car-expenses").description("Link to all car's expenses")
+                        ),
+                        requestFields(
+                                attributes(key("title").value("Fields for expense creation")),
+                                expenseRequestFieldsDescriptor()
+                        ),
+                        responseFields(
+                                expenseFieldsDescriptor()
+                        )
+                ));
+    }
+
+    private ExpenseDto getValidExpenseDto() {
+        return ExpenseDto.builder()
+                .date(LocalDate.now())
+                .title("Expense title")
+                .description("Expense description")
+                .cost(20d)
+                .build();
+    }
+
+    private FieldDescriptor[] expenseRequestFieldsDescriptor() {
+        ConstraintDescriptions expenseConstraints = new ConstraintDescriptions(ExpenseDto.class);
+
+        return new FieldDescriptor[] {
+                fieldWithPath("date")
+                        .type(JsonFieldType.STRING)
+                        .description("Expense date")
+                        .attributes(key("constraints")
+                        .value(expenseConstraints.descriptionsForProperty("date"))),
+                fieldWithPath("title")
+                        .type(JsonFieldType.STRING)
+                        .description("Expense title")
+                        .attributes(key("constraints")
+                        .value(expenseConstraints.descriptionsForProperty("title"))),
+                fieldWithPath("description")
+                        .type(JsonFieldType.STRING)
+                        .description("Expense description")
+                        .attributes(key("constraints")
+                        .value(expenseConstraints.descriptionsForProperty("description"))),
+                fieldWithPath("cost")
+                        .type(JsonFieldType.NUMBER)
+                        .description("Expense total cost")
+                        .attributes(key("constraints")
+                        .value(expenseConstraints.descriptionsForProperty("cost")))
+        };
+    }
+
+    private FieldDescriptor[] expenseFieldsDescriptor() {
+        return new FieldDescriptor[] {
+                fieldWithPath("id").type(JsonFieldType.NUMBER).description("Expense id"),
+                fieldWithPath("date").type(JsonFieldType.STRING).description("Expense date"),
+                fieldWithPath("title").type(JsonFieldType.STRING).description("Expense title"),
+                fieldWithPath("description").type(JsonFieldType.STRING).description("Expense description"),
+                fieldWithPath("cost").type(JsonFieldType.NUMBER).description("Expense total cost"),
+                fieldWithPath("carId").type(JsonFieldType.NUMBER).description("The id of the car"),
+                subsectionWithPath("_links").ignored()
+        };
+    }
+
+    private FieldDescriptor[] expensesListFieldsDescriptor() {
         return new FieldDescriptor[]{
                 fieldWithPath("_embedded.expenses")
                         .type(JsonFieldType.ARRAY)

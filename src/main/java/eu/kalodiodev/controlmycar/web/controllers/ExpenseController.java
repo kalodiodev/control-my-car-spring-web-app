@@ -3,15 +3,14 @@ package eu.kalodiodev.controlmycar.web.controllers;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.services.ExpenseService;
 import eu.kalodiodev.controlmycar.web.model.ExpenseDto;
-import eu.kalodiodev.controlmycar.web.model.ServiceDto;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -36,5 +35,19 @@ public class ExpenseController {
         Link link = linkTo(methodOn(ExpenseController.class).getAllExpensesOfCar(user, carId)).withSelfRel();
 
         return new CollectionModel<>(expenses, link);
+    }
+
+    @PostMapping("expenses")
+    public ResponseEntity<ExpenseDto> addExpense(@AuthenticationPrincipal User user,
+                                                 @PathVariable Long carId,
+                                                 @RequestBody @Valid ExpenseDto expenseDto) {
+        ExpenseDto savedExpenseDto = expenseService.save(user.getId(), carId, expenseDto);
+
+        Link expensesLink = linkTo(methodOn(ExpenseController.class).getAllExpensesOfCar(user, carId))
+                .withRel("car-expenses");
+
+        savedExpenseDto.add(expensesLink);
+
+        return new ResponseEntity<>(savedExpenseDto, HttpStatus.CREATED);
     }
 }

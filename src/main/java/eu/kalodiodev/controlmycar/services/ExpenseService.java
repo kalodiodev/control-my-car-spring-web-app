@@ -7,4 +7,6 @@ import java.util.List;
 public interface ExpenseService {
 
     List<ExpenseDto> findAllByUserIdAndByCarId(Long userId, Long carId);
+
+    ExpenseDto save(Long userId, Long carId, ExpenseDto expenseDto);
 }

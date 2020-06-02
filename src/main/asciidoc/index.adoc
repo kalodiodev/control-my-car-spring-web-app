@@ -456,3 +456,36 @@ include::{snippets}/v1/expenses/response-body.adoc[]
 
 .Response Fields:
 include::{snippets}/v1/expenses/response-fields.adoc[]
+
+
+=== Create car expense
+
+.Post a expense using cURL:
+
+include::{snippets}/v1/expense-create/curl-request.adoc[]
+
+.Expense POST HTTP request:
+
+include::{snippets}/v1/expense-create/http-request.adoc[]
+
+.Create Expense request headers:
+
+include::{snippets}/v1/expense-create/request-headers.adoc[]
+
+.Create Expense path parameters:
+
+include::{snippets}/v1/expense-create/path-parameters.adoc[]
+
+.Create Expense request fields:
+
+include::{snippets}/v1/expense-create/request-fields.adoc[]
+
+.Expense HTTP response:
+
+include::{snippets}/v1/expense-create/http-response.adoc[]
+
+.Response Body:
+include::{snippets}/v1/expense-create/response-body.adoc[]
+
+.Response Fields:
+include::{snippets}/v1/expense-create/response-fields.adoc[]
