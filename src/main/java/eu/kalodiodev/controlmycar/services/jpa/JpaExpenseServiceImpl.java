@@ -11,7 +11,9 @@ import eu.kalodiodev.controlmycar.services.ExpenseService;
 import eu.kalodiodev.controlmycar.web.model.ExpenseDto;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,5 +69,15 @@ public class JpaExpenseServiceImpl implements ExpenseService {
         Expense updated = expenseRepository.save(expenseDtoToExpense.convert(expenseDto));
 
         return expenseToExpenseDto.convert(updated);
+    }
+
+    @Transactional
+    @Override
+    public void delete(Long userId, Long carId, Long expenseId) {
+        Optional<Car> carOptional = carRepository.findCarByIdAndUserId(carId, userId);
+
+        if (carOptional.isPresent()) {
+            expenseRepository.deleteByIdAndCarId(expenseId, carId);
+        }
     }
 }

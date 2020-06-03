@@ -11,4 +11,6 @@ public interface ExpenseService {
     ExpenseDto save(Long userId, Long carId, ExpenseDto expenseDto);
 
     ExpenseDto update(Long userId, Long carId, Long expenseId, ExpenseDto expenseDto);
+
+    void delete(Long userId, Long carId, Long expenseId);
 }

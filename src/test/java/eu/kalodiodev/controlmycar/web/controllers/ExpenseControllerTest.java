@@ -26,6 +26,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
@@ -183,6 +185,24 @@ class ExpenseControllerTest extends BaseControllerTest {
                 ));
     }
 
+    @Test
+    void delete_expense() throws Exception {
+        mockMvc.perform(delete("/api/v1/cars/{carId}/expenses/{expenseId}", 1L, 1L)
+                .with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AUTHORIZATION_TOKEN))
+                .andExpect(status().isNoContent())
+                .andDo(document("v1/expense-delete",
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
+                        pathParameters(
+                                parameterWithName("carId").description("Id of the car that expense belongs to"),
+                                parameterWithName("expenseId").description("Id of the expense to delete")
+                        )
+                ));
+
+        verify(expenseService, times(1)).delete(1L, 1L, 1L);
+    }
 
     private ExpenseDto getValidExpenseDto() {
         return ExpenseDto.builder()

@@ -515,3 +515,25 @@ include::{snippets}/v1/expense-update/request-fields.adoc[]
 .Expense HTTP response:
 
 include::{snippets}/v1/expense-update/http-response.adoc[]
+
+=== Delete car expense
+
+.Delete expense using cURL:
+
+include::{snippets}/v1/expense-delete/curl-request.adoc[]
+
+.Expense HTTP DELETE request:
+
+include::{snippets}/v1/expense-delete/http-request.adoc[]
+
+.Expense delete request headers:
+
+include::{snippets}/v1/expense-delete/request-headers.adoc[]
+
+.Expense delete path parameters:
+
+include::{snippets}/v1/expense-delete/path-parameters.adoc[]
+
+.Expense HTTP response:
+
+include::{snippets}/v1/expense-delete/http-response.adoc[]

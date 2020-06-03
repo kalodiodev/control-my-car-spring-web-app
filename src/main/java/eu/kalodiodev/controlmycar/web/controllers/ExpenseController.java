@@ -3,7 +3,6 @@ package eu.kalodiodev.controlmycar.web.controllers;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.services.ExpenseService;
 import eu.kalodiodev.controlmycar.web.model.ExpenseDto;
-import eu.kalodiodev.controlmycar.web.model.ServiceDto;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -61,4 +60,12 @@ public class ExpenseController {
 
         expenseService.update(user.getId(), carId, expenseId, expenseDto);
     }
-}
+
+    @DeleteMapping("expenses/{expenseId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteExpense(@AuthenticationPrincipal User user,
+                              @PathVariable Long carId,
+                              @PathVariable Long expenseId) {
+
+        expenseService.delete(user.getId(), carId, expenseId);
+    }}

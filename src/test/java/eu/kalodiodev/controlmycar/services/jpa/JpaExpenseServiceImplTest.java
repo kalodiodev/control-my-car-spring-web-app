@@ -21,8 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class JpaExpenseServiceImplTest {
@@ -112,5 +111,26 @@ class JpaExpenseServiceImplTest {
         given(expenseRepository.findByIdAndCarId(anyLong(), anyLong())).willReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> expenseService.update(1L, 1L, 1L, new ExpenseDto()));
+    }
+
+    @Test
+    void delete_expense() {
+        Car car = new Car();
+        car.setId(1L);
+
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.of(car));
+
+        expenseService.delete(1L, 1L, 1L);
+
+        verify(expenseRepository, times(1)).deleteByIdAndCarId(1L, 1L);
+    }
+
+    @Test
+    void delete_expense_that_does_not_exist_or_belong_to_car() {
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.empty());
+
+        expenseService.delete(1L, 1L, 1L);
+
+        verifyNoInteractions(expenseRepository);
     }
 }

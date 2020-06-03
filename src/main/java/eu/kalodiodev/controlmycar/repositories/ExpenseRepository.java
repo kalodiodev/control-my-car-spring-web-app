@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     Optional<Expense> findByIdAndCarId(Long expenseId, Long carId);
+
+    void deleteByIdAndCarId(Long expenseId, Long carId);
 }
