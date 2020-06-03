@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class JpaExpenseServiceImplTest {
@@ -77,5 +79,38 @@ class JpaExpenseServiceImplTest {
         given(carRepository.findCarByIdAndUserId(anyLong(), anyLong())).willReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> expenseService.save(1L, 1L, expenseDto));
+    }
+
+    @Test
+    void update_expense() {
+        ExpenseDto expenseDto = ExpenseDto.builder()
+                .carId(1L)
+                .cost(10d)
+                .build();
+
+        Car car = new Car();
+        car.setId(1L);
+
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.of(car));
+        given(expenseRepository.findByIdAndCarId(1L, 1L)).willReturn(Optional.of(new Expense()));
+        given(expenseDtoToExpense.convert(any(ExpenseDto.class))).willReturn(new Expense());
+        given(expenseRepository.save(any(Expense.class))).willReturn(new Expense());
+        given(expenseToExpenseDto.convert(any(Expense.class))).willReturn(expenseDto);
+
+        ExpenseDto updatedExpenseDto = expenseService.update(1L, 1L, 1L, expenseDto);
+
+        assertEquals(expenseDto, updatedExpenseDto);
+        verify(expenseRepository, times(1)).save(any(Expense.class));
+    }
+
+    @Test
+    void update_expense_not_found() {
+        Car car = new Car();
+        car.setId(1L);
+
+        given(carRepository.findCarByIdAndUserId(1L, 1L)).willReturn(Optional.of(car));
+        given(expenseRepository.findByIdAndCarId(anyLong(), anyLong())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> expenseService.update(1L, 1L, 1L, new ExpenseDto()));
     }
 }

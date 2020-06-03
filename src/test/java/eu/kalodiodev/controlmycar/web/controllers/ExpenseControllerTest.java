@@ -30,8 +30,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -146,6 +145,44 @@ class ExpenseControllerTest extends BaseControllerTest {
                         )
                 ));
     }
+
+    @Test
+    void update_expense() throws Exception {
+        ExpenseDto expenseDto = getValidExpenseDto();
+
+        ExpenseDto updatedExpenseDto = getValidExpenseDto();
+        updatedExpenseDto.setId(1L);
+        updatedExpenseDto.setCarId(1L);
+
+        String jsonContent = om.writeValueAsString(expenseDto)
+                .replace("\"id\":null,", "")
+                .replace("\"carId\":null,", "")
+                .replace(",\"links\":[]", "");
+
+        given(expenseService.update(1L, 1L, 1L, expenseDto)).willReturn(updatedExpenseDto);
+
+        mockMvc.perform(patch("/api/v1/cars/{carId}/expenses/{expenseId}", 1L, 1L)
+                .with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AUTHORIZATION_TOKEN)
+                .content(jsonContent)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(document("v1/expense-update",
+                        preprocessRequest(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT authentication")
+                        ),
+                        pathParameters(
+                                parameterWithName("carId").description("Id of the car"),
+                                parameterWithName("expenseId").description("Id of the expense")
+                        ),
+                        requestFields(
+                                attributes(key("title").value("Fields for service update")),
+                                expenseRequestFieldsDescriptor()
+                        )
+                ));
+    }
+
 
     private ExpenseDto getValidExpenseDto() {
         return ExpenseDto.builder()

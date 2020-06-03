@@ -3,6 +3,7 @@ package eu.kalodiodev.controlmycar.web.controllers;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.services.ExpenseService;
 import eu.kalodiodev.controlmycar.web.model.ExpenseDto;
+import eu.kalodiodev.controlmycar.web.model.ServiceDto;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -49,5 +50,15 @@ public class ExpenseController {
         savedExpenseDto.add(expensesLink);
 
         return new ResponseEntity<>(savedExpenseDto, HttpStatus.CREATED);
+    }
+
+    @PatchMapping("expenses/{expenseId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateExpense(@AuthenticationPrincipal User user,
+                              @PathVariable Long carId,
+                              @PathVariable Long expenseId,
+                              @RequestBody @Valid ExpenseDto expenseDto) {
+
+        expenseService.update(user.getId(), carId, expenseId, expenseDto);
     }
 }

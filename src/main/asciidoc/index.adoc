@@ -489,3 +489,29 @@ include::{snippets}/v1/expense-create/response-body.adoc[]
 
 .Response Fields:
 include::{snippets}/v1/expense-create/response-fields.adoc[]
+
+=== Update car expense
+
+.Patch an expense using cURL:
+
+include::{snippets}/v1/expense-update/curl-request.adoc[]
+
+.Expense PATCH HTTP request:
+
+include::{snippets}/v1/expense-update/http-request.adoc[]
+
+.Update Expense request headers:
+
+include::{snippets}/v1/expense-update/request-headers.adoc[]
+
+.Expense update path parameters:
+
+include::{snippets}/v1/expense-update/path-parameters.adoc[]
+
+.Expense request fields:
+
+include::{snippets}/v1/expense-update/request-fields.adoc[]
+
+.Expense HTTP response:
+
+include::{snippets}/v1/expense-update/http-response.adoc[]

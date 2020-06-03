@@ -52,4 +52,20 @@ public class JpaExpenseServiceImpl implements ExpenseService {
 
         return expenseToExpenseDto.convert(expense);
     }
+
+    @Override
+    public ExpenseDto update(Long userId, Long carId, Long expenseId, ExpenseDto expenseDto) {
+        Car car = carRepository.findCarByIdAndUserId(carId, userId)
+                .orElseThrow(NotFoundException::new);
+
+        Expense expense = expenseRepository.findByIdAndCarId(expenseId, car.getId())
+                .orElseThrow(NotFoundException::new);
+
+        expenseDto.setId(expense.getId());
+        expenseDto.setCarId(expense.getId());
+
+        Expense updated = expenseRepository.save(expenseDtoToExpense.convert(expenseDto));
+
+        return expenseToExpenseDto.convert(updated);
+    }
 }
