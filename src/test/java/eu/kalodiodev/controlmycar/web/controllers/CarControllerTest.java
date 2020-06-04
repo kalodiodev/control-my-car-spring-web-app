@@ -254,7 +254,7 @@ public class CarControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void validate_add_new_car_manufacturer() throws Exception {
+    void validate_add_new_car() throws Exception {
         // Manufacturer Required
         CarDto carDto = getValidCarDto();
         carDto.setManufacturer("");

@@ -5,6 +5,7 @@ import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.services.ServiceService;
 import eu.kalodiodev.controlmycar.web.model.ServiceDto;
+import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -218,6 +220,62 @@ class ServiceControllerTest extends BaseControllerTest {
                 ));
 
         verify(serviceService, times(1)).delete(1L, 1L, 1L);
+    }
+
+    @Test
+    void validate_add_new_service() throws Exception {
+
+        ServiceDto serviceDto = getValidServiceDto();
+        post_a_new_service(serviceDto, status().isCreated());
+
+        // Date is required
+        serviceDto = getValidServiceDto();
+        serviceDto.setDate(null);
+        post_a_new_service(serviceDto, status().is4xxClientError());
+
+        // Date must be in the past or present
+        serviceDto = getValidServiceDto();
+        serviceDto.setDate(LocalDate.now().plusDays(1));
+        post_a_new_service(serviceDto, status().is4xxClientError());
+
+        // Title required
+        serviceDto = getValidServiceDto();
+        serviceDto.setTitle("");
+        post_a_new_service(serviceDto, status().is4xxClientError());
+
+        // Title min length
+        serviceDto = getValidServiceDto();
+        serviceDto.setTitle(RandomString.make(2));
+        post_a_new_service(serviceDto, status().is4xxClientError());
+
+        // Title max length
+        serviceDto = getValidServiceDto();
+        serviceDto.setTitle(RandomString.make(191));
+        post_a_new_service(serviceDto, status().is4xxClientError());
+
+        // Odometer is required
+        serviceDto = getValidServiceDto();
+        serviceDto.setOdometer(null);
+        post_a_new_service(serviceDto, status().is4xxClientError());
+
+        // Cost is required
+        serviceDto = getValidServiceDto();
+        serviceDto.setCost(null);
+        post_a_new_service(serviceDto, status().is4xxClientError());
+    }
+
+    void post_a_new_service(ServiceDto serviceDto, ResultMatcher status) throws Exception {
+        ServiceDto savedServiceDto = getValidServiceDto();
+        savedServiceDto.setId(1L);
+        savedServiceDto.setCarId(1L);
+
+        given(serviceService.save(1L, 1L, serviceDto)).willReturn(savedServiceDto);
+
+        mockMvc.perform(post("/api/v1/cars/{carId}/services", 1).with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AUTHORIZATION_TOKEN)
+                .content(om.writeValueAsString(serviceDto))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status);
     }
 
     private ServiceDto getValidServiceDto() {
