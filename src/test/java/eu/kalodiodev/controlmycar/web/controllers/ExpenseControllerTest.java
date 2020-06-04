@@ -4,6 +4,7 @@ import eu.kalodiodev.controlmycar.SecurityTestConfig;
 import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.services.ExpenseService;
 import eu.kalodiodev.controlmycar.web.model.ExpenseDto;
+import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -202,6 +204,57 @@ class ExpenseControllerTest extends BaseControllerTest {
                 ));
 
         verify(expenseService, times(1)).delete(1L, 1L, 1L);
+    }
+
+    @Test
+    void validate_add_new_expense() throws Exception {
+
+        ExpenseDto expenseDto = getValidExpenseDto();
+        post_a_new_expense(expenseDto, status().isCreated());
+
+        // Date is required
+        expenseDto = getValidExpenseDto();
+        expenseDto.setDate(null);
+        post_a_new_expense(expenseDto, status().is4xxClientError());
+
+        // Date must be in the past or present
+        expenseDto = getValidExpenseDto();
+        expenseDto.setDate(LocalDate.now().plusDays(1));
+        post_a_new_expense(expenseDto, status().is4xxClientError());
+
+        // Title required
+        expenseDto = getValidExpenseDto();
+        expenseDto.setTitle("");
+        post_a_new_expense(expenseDto, status().is4xxClientError());
+
+        // Title min length
+        expenseDto = getValidExpenseDto();
+        expenseDto.setTitle(RandomString.make(2));
+        post_a_new_expense(expenseDto, status().is4xxClientError());
+
+        // Title max length
+        expenseDto = getValidExpenseDto();
+        expenseDto.setTitle(RandomString.make(191));
+        post_a_new_expense(expenseDto, status().is4xxClientError());
+
+        // Cost is required
+        expenseDto = getValidExpenseDto();
+        expenseDto.setCost(null);
+        post_a_new_expense(expenseDto, status().is4xxClientError());
+    }
+
+    void post_a_new_expense(ExpenseDto expenseDto, ResultMatcher status) throws Exception {
+        ExpenseDto savedExpenseDto = getValidExpenseDto();
+        savedExpenseDto.setId(1L);
+        savedExpenseDto.setCarId(1L);
+
+        given(expenseService.save(1L, 1L, expenseDto)).willReturn(savedExpenseDto);
+
+        mockMvc.perform(post("/api/v1/cars/{carId}/expenses", 1).with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AUTHORIZATION_TOKEN)
+                .content(om.writeValueAsString(expenseDto))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status);
     }
 
     private ExpenseDto getValidExpenseDto() {
