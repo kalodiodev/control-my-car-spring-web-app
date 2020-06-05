@@ -5,6 +5,7 @@ import eu.kalodiodev.controlmycar.domains.User;
 import eu.kalodiodev.controlmycar.exceptions.NotFoundException;
 import eu.kalodiodev.controlmycar.services.FuelRefillService;
 import eu.kalodiodev.controlmycar.web.model.FuelRefillDto;
+import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -223,6 +225,88 @@ class FuelRefillControllerTest extends BaseControllerTest {
                 ));
 
         verify(fuelRefillService, times(1)).delete(1L, 1L, 1L);
+    }
+
+    @Test
+    void validate_date() throws Exception {
+        // Date is required
+        FuelRefillDto fuelRefillDto = getValidFuelRefillDto();
+        fuelRefillDto.setDate(null);
+        post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
+
+        // Date must be in the past or present
+        fuelRefillDto = getValidFuelRefillDto();
+        fuelRefillDto.setDate(LocalDate.now().plusDays(1));
+        post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
+    }
+
+    @Test
+    void validate_details() throws Exception {
+        // Details max length
+        FuelRefillDto fuelRefillDto = getValidFuelRefillDto();
+        fuelRefillDto.setDetails(RandomString.make(251));
+        post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
+    }
+
+    @Test
+    void validate_gas_station() throws Exception {
+        // Gas station max length
+        FuelRefillDto fuelRefillDto = getValidFuelRefillDto();
+        fuelRefillDto.setGasStation(RandomString.make(251));
+        post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
+    }
+
+    @Test
+    void validate_odometer() throws Exception {
+        // Odometer is required
+        FuelRefillDto fuelRefillDto = getValidFuelRefillDto();
+        fuelRefillDto.setOdometer(null);
+        post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
+
+        // Odometer must be positive
+        fuelRefillDto = getValidFuelRefillDto();
+        fuelRefillDto.setOdometer(-100d);
+        post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
+    }
+
+    @Test
+    void validate_volume() throws Exception {
+        // Volume is required
+        FuelRefillDto fuelRefillDto = getValidFuelRefillDto();
+        fuelRefillDto.setVolume(null);
+        post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
+
+        // Volume must be positive
+        fuelRefillDto = getValidFuelRefillDto();
+        fuelRefillDto.setVolume(-10d);
+        post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
+    }
+
+    @Test
+    void validate_cost() throws Exception {
+        // Cost is required
+        FuelRefillDto fuelRefillDto = getValidFuelRefillDto();
+        fuelRefillDto.setCost(null);
+        post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
+
+        // Cost must be positive
+        fuelRefillDto = getValidFuelRefillDto();
+        fuelRefillDto.setCost(-10d);
+        post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
+    }
+
+    void post_a_new_fuel_refill(FuelRefillDto fuelRefillDto, ResultMatcher status) throws Exception {
+        FuelRefillDto savedFuelRefillDto = getValidFuelRefillDto();
+        savedFuelRefillDto.setId(1L);
+        savedFuelRefillDto.setCarId(1L);
+
+        given(fuelRefillService.save(1L, 1L, fuelRefillDto)).willReturn(savedFuelRefillDto);
+
+        mockMvc.perform(post("/api/v1/cars/{carId}/fuelrefills", 1).with(user(authenticatedUser))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AUTHORIZATION_TOKEN)
+                .content(om.writeValueAsString(fuelRefillDto))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .andExpect(status);
     }
 
     private FuelRefillDto getValidFuelRefillDto() {

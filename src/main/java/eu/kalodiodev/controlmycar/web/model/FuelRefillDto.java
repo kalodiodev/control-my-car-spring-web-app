@@ -8,10 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.PastOrPresent;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @Data
@@ -30,12 +27,15 @@ public class FuelRefillDto extends RepresentationModel<FuelRefillDto> {
     private LocalDate date;
 
     @NotNull
+    @Positive
     private Double odometer;
 
     @NotNull
+    @Positive
     private Double volume;
 
     @NotNull
+    @Positive
     private Double cost;
 
     @NotNull
