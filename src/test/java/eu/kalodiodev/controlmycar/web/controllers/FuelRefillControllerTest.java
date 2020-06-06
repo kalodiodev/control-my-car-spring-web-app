@@ -295,6 +295,14 @@ class FuelRefillControllerTest extends BaseControllerTest {
         post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
     }
 
+    @Test
+    void validate_full_refill() throws Exception {
+        // Full refill cannot be null
+        FuelRefillDto fuelRefillDto = getValidFuelRefillDto();
+        fuelRefillDto.setFullRefill(null);
+        post_a_new_fuel_refill(fuelRefillDto, status().is4xxClientError());
+    }
+
     void post_a_new_fuel_refill(FuelRefillDto fuelRefillDto, ResultMatcher status) throws Exception {
         FuelRefillDto savedFuelRefillDto = getValidFuelRefillDto();
         savedFuelRefillDto.setId(1L);
