@@ -29,6 +29,7 @@ public class ExpenseDto  extends RepresentationModel<ExpenseDto>  {
     @Size(min = 3, max = 190)
     private String title;
 
+    @Size(max = 255)
     private String description;
 
     @NotNull

@@ -207,13 +207,9 @@ class ExpenseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void validate_add_new_expense() throws Exception {
-
-        ExpenseDto expenseDto = getValidExpenseDto();
-        post_a_new_expense(expenseDto, status().isCreated());
-
+    void validate_date() throws Exception {
         // Date is required
-        expenseDto = getValidExpenseDto();
+        ExpenseDto expenseDto = getValidExpenseDto();
         expenseDto.setDate(null);
         post_a_new_expense(expenseDto, status().is4xxClientError());
 
@@ -221,9 +217,12 @@ class ExpenseControllerTest extends BaseControllerTest {
         expenseDto = getValidExpenseDto();
         expenseDto.setDate(LocalDate.now().plusDays(1));
         post_a_new_expense(expenseDto, status().is4xxClientError());
+    }
 
+    @Test
+    void validate_title() throws Exception {
         // Title required
-        expenseDto = getValidExpenseDto();
+        ExpenseDto expenseDto = getValidExpenseDto();
         expenseDto.setTitle("");
         post_a_new_expense(expenseDto, status().is4xxClientError());
 
@@ -236,9 +235,20 @@ class ExpenseControllerTest extends BaseControllerTest {
         expenseDto = getValidExpenseDto();
         expenseDto.setTitle(RandomString.make(191));
         post_a_new_expense(expenseDto, status().is4xxClientError());
+    }
 
+    @Test
+    void validate_description() throws Exception {
+        // Description max length
+        ExpenseDto expenseDto = getValidExpenseDto();
+        expenseDto.setTitle(RandomString.make(256));
+        post_a_new_expense(expenseDto, status().is4xxClientError());
+    }
+
+    @Test
+    void validate_cost() throws Exception {
         // Cost is required
-        expenseDto = getValidExpenseDto();
+        ExpenseDto expenseDto = getValidExpenseDto();
         expenseDto.setCost(null);
         post_a_new_expense(expenseDto, status().is4xxClientError());
     }
