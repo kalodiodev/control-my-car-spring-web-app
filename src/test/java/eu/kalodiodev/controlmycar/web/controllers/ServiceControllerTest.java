@@ -223,13 +223,9 @@ class ServiceControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void validate_add_new_service() throws Exception {
-
-        ServiceDto serviceDto = getValidServiceDto();
-        post_a_new_service(serviceDto, status().isCreated());
-
+    void validate_date() throws Exception {
         // Date is required
-        serviceDto = getValidServiceDto();
+        ServiceDto serviceDto = getValidServiceDto();
         serviceDto.setDate(null);
         post_a_new_service(serviceDto, status().is4xxClientError());
 
@@ -237,9 +233,12 @@ class ServiceControllerTest extends BaseControllerTest {
         serviceDto = getValidServiceDto();
         serviceDto.setDate(LocalDate.now().plusDays(1));
         post_a_new_service(serviceDto, status().is4xxClientError());
+    }
 
+    @Test
+    void validate_title() throws Exception {
         // Title required
-        serviceDto = getValidServiceDto();
+        ServiceDto serviceDto = getValidServiceDto();
         serviceDto.setTitle("");
         post_a_new_service(serviceDto, status().is4xxClientError());
 
@@ -252,9 +251,20 @@ class ServiceControllerTest extends BaseControllerTest {
         serviceDto = getValidServiceDto();
         serviceDto.setTitle(RandomString.make(191));
         post_a_new_service(serviceDto, status().is4xxClientError());
+    }
 
+    @Test
+    void validate_description() throws Exception {
+        // Description max length
+        ServiceDto serviceDto = getValidServiceDto();
+        serviceDto.setDescription(RandomString.make(256));
+        post_a_new_service(serviceDto, status().is4xxClientError());
+    }
+
+    @Test
+    void validate_odometer() throws Exception {
         // Odometer is required
-        serviceDto = getValidServiceDto();
+        ServiceDto serviceDto = getValidServiceDto();
         serviceDto.setOdometer(null);
         post_a_new_service(serviceDto, status().is4xxClientError());
 
